@@ -1,0 +1,25 @@
+<%- include page/header %>
+
+<!--更新時間:<%=new Date() %> -->
+	<div class="row">
+		<div class="col-md-12 column">
+            <iframe src="<%= weatherUrl %>" width="100%" height="600" frameborder="1" scrolling="no"></iframe>
+		</div> <!-- column-->
+	</div>	<!--row-->
+
+	<div class="row">
+		<div class="col-md-12 column">
+			<label id="error_message" class="checkbox">
+	            <font color="red"><b></b>
+	            <% if (user.authz.a03==false) { %>
+	                你沒有觀看權限,請通知管理員變更權限!
+	            <% } %>
+	        </label>
+		</div> <!-- column-->
+		<!--<div class="col-md-12">
+			<button type="button" name="edit" class="btn btn-primary btn-sm" onClick = "test()">
+				<span class="glyphicon glyphicon-list-alt"></span> test
+			</button>
+		</div>--> <!-- col-md-3 -->
+	</div>	<!--row-->
+<%- include page/footer %>

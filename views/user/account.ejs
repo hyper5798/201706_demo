@@ -1,0 +1,277 @@
+<%- include ../page/header %>
+	<div class="row">
+		<div class="col-md-12 column">
+			<form method = "post" id="unitList" name="unitList">
+				<table class="table table-striped table-hover">
+					<thead>
+						<tr>
+							<th>
+								帳號
+							</th>
+							<th>
+								可用
+							</th>
+							<th>
+								帳號資訊
+							</th>
+							<th>
+								首頁
+							</th>
+							<th>
+								最新訊息
+							</th>
+							<th>
+								圖表分析
+							</th>
+							<th>
+								資料查詢
+							</th>
+							<th>
+								裝置設定
+							</th>
+							<th>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+					<% if (users) { %>
+						<% for(var i = 0;i<users.length;i++) { %>
+							<tr>
+								<td>
+									<%= users[i].name %>
+								</td>
+								<td>
+								    <% if(users[i].enable) { %>
+										<input type="checkbox" name="enable" value="enable" checked onchange="enableCheck(<%= i%>,this)">
+									<% }else { %>
+										<input type="checkbox" name="enable" value="enable" onchange="enableCheck(<%= i%>,this)">
+									<% } %>
+								</td>
+								<td>
+									<% if(users[i].authz.a01) { %>
+										<input type="checkbox" name="data" value="a01" checked>
+									<% }else { %>
+										<input type="checkbox" name="data" value="a01">
+									<% } %>
+								</td>
+								<td>
+									<% if(users[i].authz.a02) { %>
+										<input type="checkbox" name="data" value="a02" checked>
+									<% }else { %>
+										<input type="checkbox" name="data" value="a02">
+									<% } %>
+								</td>
+								<td>
+									<% if(users[i].authz.a03) { %>
+										<input type="checkbox" name="data" value="a03" checked>
+									<% }else { %>
+										<input type="checkbox" name="data" value="a03">
+									<% } %>
+								</td>
+								<td>
+									<% if(users[i].authz.a04) { %>
+										<input type="checkbox" name="data" value="a04" checked>
+									<% }else { %>
+										<input type="checkbox" name="data" value="a04">
+									<% } %>
+								</td>
+								<td>
+									<% if(users[i].authz.a05) { %>
+										<input type="checkbox" name="data" value="a05" checked>
+									<% }else { %>
+										<input type="checkbox" name="data" value="a05">
+									<% } %>
+								</td>
+								<td>
+									<% if(users[i].authz.a06) { %>
+										<input type="checkbox" name="data" value="a06" checked>
+									<% }else { %>
+										<input type="checkbox" name="data" value="a06">
+									<% } %>
+								</td>
+								<td>
+									<button type="button" name="edit" class="btn btn-primary btn-sm" onClick="editCheck(<%= i %>,'<%= users[i].name %>')">
+										<span class="glyphicon glyphicon-edit"></span> 編輯
+									</button>
+									<button type="button" name="cancel" class="btn btn-danger btn-sm" onClick="refresh(<%= i %>,<%= JSON.stringify(users[i].enable) %>,<%= JSON.stringify(users[i].authz) %>)">
+										<span class="glyphicon glyphicon-refresh"></span> 取消
+									</button>
+									<button type="button" name="del" class="btn btn-danger btn-sm" onClick="delCheck(<%= i %>,'<%= users[i].name %>')">
+										<span class="glyphicon glyphicon-trash"></span> 刪除
+									</button>
+								</td>
+							</tr>
+						<% } %>
+					<% } %>
+					</tbody>
+				</table>
+				<input id="postSelect" name="postSelect" type="hidden"">
+				<input id="postName" name="postName" type="hidden"">
+			</form>
+
+		</div> <!-- column-->
+	</div>	<!--row-->
+
+<!-- （Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close"
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               刪除帳戶警告
+            </h4>
+         </div>
+         <div id="account" class="modal-body">
+            確定刪除帳戶嗎?
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default"
+               data-dismiss="modal">關閉
+            </button>
+            <button type="button" onClick="toSubmit()" class="btn btn-danger">
+               確定刪除
+            </button>
+         </div>s
+      </div><!-- /.modal-content -->
+</div><!-- /.modal -->
+
+	<script src="js/bootstrap-table.js"></script>
+
+<script class="code" type="text/javascript">
+
+	$(document).ready(function () {
+		var enable = $('[name=enable]');
+		//alert(enable.length);
+		for(var i=0;i<enable.length;i++){
+			if(!enable[i].checked){
+				toDisableCheckBox(i,true);
+			}
+		}
+		setTimeout(function(){
+		    //do what you need here
+		    document.getElementById('result').innerText = '';
+		}, 3000);
+	});
+
+
+	function editCheck(index,name){
+		//alert(index+" : "+name);
+		var postSelect = document.getElementById("postSelect");
+		var postName = document.getElementById("postName");
+		postName.value = name;
+
+		var enable = $('[name=enable]');
+		var arrSelect = [];
+		arrSelect.push(enable[index].checked);
+		//alert('arrSelect :'+ arrSelect);
+		var data = $('[name=data]');
+
+		for(var i=0;i<data.length;i++){
+
+			if(i==0+(6*index)){
+				//alert(i+ ') checked :'+ data[i].checked);
+				arrSelect.push(data[i].checked);
+			}else if(i==1+(6*index)){
+				//alert(i+ ') checked :'+ data[i].checked);
+				arrSelect.push(data[i].checked);
+			}else if(i==2+(6*index)){
+				//alert(i+ ') checked :'+ data[i].checked);
+				arrSelect.push(data[i].checked);
+			}else if(i==3+(6*index)){
+				//alert(i+ ') checked :'+ data[i].checked);
+				arrSelect.push(data[i].checked);
+			}else if(i==4+(6*index)){
+				//alert(i+ ') checked :'+ data[i].checked);
+				arrSelect.push(data[i].checked);
+			}else if(i==5+(6*index)){
+				//alert(i+ ') checked :'+ data[i].checked);
+				arrSelect.push(data[i].checked);
+			}
+		}
+		//alert('arrSelect'+ arrSelect);
+		postSelect.value = arrSelect;
+		document.getElementById("unitList").submit();
+	}
+
+	function delCheck(index,name){
+
+		//alert(index+" : "+name);
+		postName.value = name;
+		document.getElementById("account").innerText='確定刪除 '+name+' 帳戶嗎?';
+		$('#myModal').modal('show');
+	}
+
+	function refresh(index,enable,authz){
+		$('[name=enable]').eq(index).prop("checked", enable);
+		var authzStr = JSON.stringify(authz);
+
+		var data = $('[name=data]');
+		//alert(data.length);
+
+		for(var i=0;i<data.length;i++){
+
+			if(i==0+(6*index)){
+				//alert(i+ ') authz.a01 :'+ authz.a01);
+				data.eq(i).prop("checked", authz.a01);
+			}else if(i==1+(6*index)){
+				//alert('authz.a02 :'+ authz.a02);
+				data.eq(i).prop("checked", authz.a02);
+			}else if(i==2+(6*index)){
+				//alert('authz.a03 :'+ authz.a03);
+				data.eq(i).prop("checked", authz.a03);
+			}else if(i==3+(6*index)){
+				//alert('authz.a04 :'+ authz.a04);
+				data.eq(i).prop("checked", authz.a04);
+			}else if(i==4+(6*index)){
+				//alert('authz.a05 :'+ authz.a05);
+				data.eq(i).prop("checked", authz.a05);
+			}else if(i==5+(6*index)){
+				//alert('authz.a06 :'+ authz.a06);
+				data.eq(i).prop("checked", authz.a06);
+			}
+		}
+		toDisableCheckBox(index,!enable);
+	}
+
+	function enableCheck(index,checkbox){
+		//alert(index);
+        toDisableCheckBox(index,!checkbox.checked);
+    }
+
+    function toDisableCheckBox(index,isDisable){
+
+    	var data = $('[name=data]');
+		//alert(data.length);
+
+		for(var i=0;i<data.length;i++){
+			if(i==0+(6*index)){
+				data.eq(i).prop("disabled", isDisable);
+			}else if(i==1+(6*index)){
+				data.eq(i).prop("disabled", isDisable);
+			}else if(i==2+(6*index)){
+				data.eq(i).prop("disabled", isDisable);
+			}else if(i==3+(6*index)){
+				data.eq(i).prop("disabled", isDisable);
+			}else if(i==4+(6*index)){
+				data.eq(i).prop("disabled", isDisable);
+			}else if(i==5+(6*index)){
+				data.eq(i).prop("disabled", isDisable);
+			}
+		}
+    	/*$('[name=data]').each(function(){
+			$(this).prop("disabled", isDisable);
+        });*/
+    }
+
+	function toSubmit(){
+		$('#myModal').modal('hide');
+		document.getElementById("unitList").submit();
+	}
+</script>
+
+<%- include ../page/footer %>

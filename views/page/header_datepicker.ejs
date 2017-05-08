@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= title%></title>
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/datepicker3.css" rel="stylesheet">
+<link href="css/styles.css" rel="stylesheet">
+<link href="/js/jqplot/jquery.jqplot.css" rel="stylesheet">
+<link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<!-- jquery.dataTables-->
+<link href="vendor/DataTables-1.10.13/media/css/jquery.dataTables.min.css" rel="stylesheet">
+<!-- button.dataTables-->
+<link href="vendor/DataTables-1.10.13/extensions/Buttons/css/buttons.dataTables.min.css" rel="stylesheet">
+<script src="js/jquery-1.12.4.js"></script>
+<!--  JSCal2-1.7-->
+<link href="/vendor/JSCal2-1.7/css/jscal2.css" type="text/css" rel="stylesheet"/>
+<!--<script src="//code.jquery.com/jquery-1.12.4.js"></script>-->
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/jqplot/jquery.jqplot.min.js"></script>
+<script src="/js/jqplot/plugins/jqplot.dateAxisRenderer.js"></script>
+<!--<script type="text/javascript" src="http://cdn.jsdelivr.net/jqplot/1.0.8/plugins/jqplot.dateAxisRenderer.min.js"></script>-->
+<!--<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/hot-sneaks/jquery-ui.css" rel="stylesheet">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>-->
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/hot-sneaks/jquery-ui.css" rel="stylesheet">
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+<!--<script type="text/javascript" src="../jquery/jquery.ui.datepicker-zh-TW.js"></script>-->
+<!--<script src="/js/jquery-ui.min.js"></script>-->
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="jquery.validate.min.js"></script>
+<script type="text/javascript" src="additional-methods.min.js"></script>
+<script type="text/javascript" src="/localization/messages_zh_TW.js"></script>
+<!-- JQUERY DataTables-->
+<script type="text/javascript" src="vendor/DataTables-1.10.13/media/js/jquery.dataTables.min.js"></script>
+<!-- Button DataTables-->
+<script type="text/javascript" src="vendor/DataTables-1.10.13/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+<!-- JZIP -->
+<script type="text/javascript" src="vendor/DataTables-1.10.13/jszip.min.js"></script>
+<!-- PDF MAKE -->
+<script type="text/javascript" src="vendor/DataTables-1.10.13/pdfmake.min.js"></script>
+<!-- VFS FONT -->
+<script type="text/javascript" src="vendor/DataTables-1.10.13/vfs_fonts.js"></script>
+<!-- BUTTON HTML5 -->
+<script type="text/javascript" src="/js/bootstrap-waitingfor.min.js"></script>
+<!-- WAITING DIALOG -->
+<script type="text/javascript" src="vendor/DataTables-1.10.13/extensions/Buttons/js/buttons.html5.js"></script>
+<!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
+<!--  JSCal2-1.7-->
+<script type="text/javascript" src="/vendor/JSCal2-1.7/js/jscal2.js"></script>
+<script type="text/javascript" src="/vendor/JSCal2-1.7/js/lang/b5.js"></script>
+</head>
+
+<body>
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#sidebar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="\"><span>Node</span>Admin</a>
+				<% if(user){ %>
+					<ul class="user-menu">
+						<li class="dropdown pull-right">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span>
+								<% if(user.name){ %>
+									<%= user.name %>
+								<% } %>
+							<span class="caret"></span></a>
+							<ul class="dropdown-menu" role="menu">
+								<li><a href="/info"><span class="glyphicon glyphicon-user"></span> 帳號資訊</a></li>
+								<% if(user.level == 0){ %>
+									<li><a href="/account"><span class="glyphicon glyphicon-cog"></span> 帳戶管理</a></li>
+								<% } %>
+								<li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> 登出</a></li>
+							</ul>
+						</li>
+				</ul>
+				<% } %>
+
+			</div>
+		</div><!-- /.container-fluid -->
+	</nav>
+
+	<div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar">
+		<!--<form role="search">
+			<div class="form-group">
+				<input type="text" class="form-control" placeholder="Search">
+			</div>
+		</form>-->
+		<ul class="nav menu">
+		<% if(title ==='首頁'){ %>
+			<li class="active">
+		<% }else{ %>
+			<li>
+		<% } %>
+			<a href="/"><span class="glyphicon glyphicon-dashboard"></span> 首頁</a></li>
+		<% if(title ==='微型氣象站'){ %>
+			<li class="active">
+		<% }else{ %>
+			<li>
+		<% } %>
+			<a href="/weather"><span class="glyphicon glyphicon-tint"></span> 微型氣象站</a></li>
+		<% if(title ==='最新訊息'){ %>
+			<li class="active">
+		<% }else{ %>
+			<li>
+		<% } %>
+			<a href="/update"><span class="glyphicon glyphicon-info-sign"></span> 最新訊息</a></li>
+		<% if(title ==='圖表分析'){ %>
+			<li class="active">
+		<% }else{ %>
+			<li>
+		<% } %>
+			<a href="/chart"><span class="glyphicon glyphicon-stats"></span> 圖表分析</a></li>
+		<% if(title ==='資料查詢'){ %>
+			<li class="active">
+		<% }else{ %>
+			<li>
+		<% } %>
+			<a href="/find"><span class="glyphicon glyphicon-list-alt"></span> 資料查詢</a></li>
+		<% if(title ==='裝置設定'){ %>
+			<li class="active">
+		<% }else{ %>
+			<li>
+		<% } %>
+			<a href="/setting"><span class="glyphicon glyphicon-pencil"></span> 裝置設定</a></li>
+		<div class="attribution">版權所有 <a href="http://www.gemtek.com.tw/national/2.htm" target="_blank" title="正文科技">正文科技</a> </div>
+	</div><!--/.sidebar-->
+
+<!-- main start-------------------------------------------------------------------------------------------------------- -->
+<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
+	<div class="row">
+		<div class="col-lg-12">
+			<ol class="breadcrumb">
+				<li><a href="#"><span class="glyphicon glyphicon-home"></span></a></li>
+				<li class="active"><%= title%></li>
+				<li class="active">
+					<label id="warning_message">
+        			</label>
+				</li>
+			</ol>
+
+			<div class="row">
