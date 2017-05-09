@@ -142,7 +142,6 @@ var sock = require('socket.io').listen(server.listen(port));
 // Start the runtime
 RED.start();
 
-updateAllUnitsStatus();
 
 /*app.listen(app.get('port'), function() {
   console.log('Express server listening on port ' + app.get('port'));
@@ -154,7 +153,7 @@ console.log('settings.db : '+settings.db);
 var date = moment();
 
 //macList is for unit type = 'aa00'
-var myUnits,macList = [],finalTimeList = {};
+var myUnits,macList = [];
 findUnitsMac();
 
 sock.on('connection',function(client){
@@ -346,41 +345,7 @@ function getType(p) {
     else return 'other';
 }
 
-var count = 0;
 
-function updateAllUnitsStatus(){
-	console.log('time:'+new Date());
-	UnitDbTools.findAllUnits(function(err,units){
-		count = units.length;
-  		async.each(units,function(unit,callback){
-			updateStatus(unit,function(){
-				callback();
-			});
-  		},function(err){
-  			console.log('Debug todos -> get unit err : '+err);
-  		});
-  	});
-}
-
-function updateStatus(unit,callback){
-    //console.log('unit : '+unit);
-	var tasks = ['find_last_device','compare_status'];
-	var last_timestamp = Number(moment().subtract(2,'hours'));
-	var status = 0;
-
-	DeviceDbTools.findLastDeviceByMac(unit.macAddr,function(err,device){
-		if(err){
-			return callback(unit.status);
-		}
-		if(device){
-			//console.log('device : '+device);
-			finalTimeList[device.macAddr] = Number(moment(device.recv_at));
-			if(finalTimeList.length === count){
-				JsonFileTools.saveJsonToFile('./public/data/finalTimeList.json',finalTimeList);
-			}
-		}
-	});
-}
 
 //for aa00 device (temprature/huminity) status
 function findUnitsMac(){

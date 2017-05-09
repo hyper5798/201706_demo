@@ -1,0 +1,188 @@
+<%- include page/header %>
+		<div class="row">
+			<div class="col-md-12 column">
+				<div class="panel panel-primary">
+					<div class="panel-heading"><span class="glyphicon glyphicon-edit"></span> 通知設定欄</div>
+					<div class="panel-body">
+						<div class="col-md-12">
+							<label class="control-label" for="type">選擇通知裝置</label>
+
+
+							<select id="typeSelecter" name="typeSelecter" onchange="changeType(this.value)">
+								<% if(units) { %>
+									<% for(var i=0;i<units.length;i++){ %>
+										<% if(selectedType ===  units[i].type )  { %>
+											<option value = "<%= units[i].type %>"  selected>
+										<% }else{ %>
+											<option value = "<%= units[i].type %>" >
+										<% } %>
+
+										<%= units[i].name %>
+											</option>
+									<% } %>
+								<% } %>
+							</select>
+
+						</div>
+
+						<!--/.col-md-12" -->
+						<div class="col-md-12">
+
+						<br>
+
+
+							<form id="editNotify" class="form-horizontal" action="" method="post">
+								<fieldset>
+									<!-- Name input-->
+									<% if(info) { %>
+										<table  class="table table-bordered table-hover table-striped">
+				                            <thead>
+				                                <tr class="info">
+				                                    <th>名稱</th>
+				                                    <th>最大值</th>
+				                                    <th>最小值</th>
+				                                    <th>最大值提示</th>
+				                                    <th>最小值提示</th>
+				                                </tr>
+				                            </thead>
+
+										<% var keys = Object.keys(info.fieldName); %>
+
+										<% for(var j=0;j<keys.length;j++){ %>
+
+					                            <tbody>
+					                                <tr >
+					                                    <td><%= info.fieldName[keys[j]] %></td>
+					                                    <td>
+					                                    	<% if(info.notify && info.notify[keys[j]]['max']){ %>
+					                                    		<input name="max" type="number" value="<%= info.notify[keys[j]]['max'] %>" />
+					                                    	<% } else { %>
+					                                    		<input name="max" type="number" placeholder="請輸入通知最大值" />
+					                                    	<% } %>
+					                                    </td>
+					                                    <td>
+					                                    	<% if(info.notify && info.notify[keys[j]]['min']){ %>
+					                                    		<input name="min" type="number" value="<%= info.notify[keys[j]]['min'] %>" />
+					                                    	<% } else { %>
+					                                    		<input name="min" type="number" placeholder="請輸入通知最小值" />
+					                                    	<% } %>
+
+					                                    </td>
+					                                    <td>
+					                                    	<% if(info.notify && info.notify[keys[j]]['maxInfo']){ %>
+					                                    		<input name="maxInfo" type="text" value="<%= info.notify[keys[j]]['maxInfo'] %>" />
+					                                    	<% } else { %>
+					                                    		<input name="maxInfo" type="text" placeholder="大於最大值提示" />
+					                                    	<% } %>
+					                                    </td>
+					                                    <td>
+					                                    	<% if(info.notify && info.notify[keys[j]]['minInfo']){ %>
+					                                    		<input name="minInfo" type="text" value="<%= info.notify[keys[j]]['minInfo'] %>" />
+					                                    	<% } else { %>
+					                                    		<input name="minInfo" type="textr" placeholder="小於最小值提示" />
+					                                    	<% } %>
+					                                    </td>
+					                            </tbody>
+
+										<% } %>
+										</table>
+
+									<% } %>
+
+
+								</fieldset>
+								<input id="mode" name="mode" type="hidden" value="save">
+								<input id="type" name="type" type="hidden" value="<%= selectedType %>">
+							</form>
+						</div>
+						<!--/.col-md-12" -->
+						<div class="btn pull-right">
+							<button type="button" name="edit" onClick="toSubmit()" class="btn btn-primary btn-sm">
+								<span class="glyphicon glyphicon-list-alt"></span> &nbsp&nbsp儲存
+							</button>
+						</div>
+					</div>
+				</div>
+
+			</div><!--/.col-->
+
+		</div><!--/.row-->
+
+<!-- （Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close"
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">
+               刪除裝置警告
+            </h4>
+         </div>
+         <div class="modal-body">
+            確定刪除裝置嗎?
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-default"
+               data-dismiss="modal">關閉
+            </button>
+            <button type="button" onClick="toSubmit()" class="btn btn-danger">
+               確定刪除
+            </button>
+         </div>
+      </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
+
+
+<script class="code" type="text/javascript">
+	$(document).ready(function () {
+
+	});
+	 var unitList={};
+
+
+	$("form").submit(function () {
+	  	if(document.getElementById("mac").value.length != 8){
+			alert('MAC字數須為8');
+			return false;
+		}else{
+			$("#type_option").children().each(function(){
+            	//alert('$(this).val() = '+  $(this).val() + ' -> '+$("#type_option").val());
+			    if ($(this).val()==$("#type_option").val()){
+			        //jQuery給法
+			        $(this).attr("selected", "true"); //或是給"selected"也可
+			        //alert(' $(this).text() : '+ $(this).text());
+			        var typeString = document.getElementById("typeString");
+            		typeString.value = $(this).text();
+			        //javascript給法
+			        this.selected = true;
+	    		}
+			});
+			//alert($( "#type_option" ).val());
+			if($( "#type_option" ).val() == 'd001'){
+				socket.emit('setting_client_new',{mac:document.getElementById("mac").value});
+			}
+		}
+	});
+
+
+	function toSubmit(){
+
+		//alert('type:'+document.getElementById("type").value);
+		//alert('mode:'+document.getElementById("mode").value);
+		document.getElementById("editNotify").submit();
+	}
+
+	function changeType(value){
+		alert('selecte type:'+value);
+		$("#mode").val("changeType");
+		$("#type").val(value);
+		document.getElementById("editNotify").submit();
+	}
+
+
+</script>
+<%- include page/footer %>

@@ -9,6 +9,8 @@ var settings = require('../settings');
 var moment = require('moment');
 var noWeatherDevice = true;
 var finalList = {};
+var infoPath = './public/data/deviceInfos.json';
+
 var hour = 60*60*1000;
 
 function getNewData(obj){
@@ -41,6 +43,8 @@ function getNewData(obj){
 	return obj;
 }
 
+
+
 function findUnitsAndShowSetting(req,res,isUpdate){
 	UnitDbTools.findAllUnits(function(err,units){
 		var successMessae,errorMessae;
@@ -49,7 +53,7 @@ function findUnitsAndShowSetting(req,res,isUpdate){
 		if(err){
 			errorMessae = err;
 		}else{
-			if(+units.length>0){
+			if(units.length>0){
 				successMessae = '查詢到'+units.length+'筆資料';
 			}
 			/*for(var i=0;i<units.length;i++){
@@ -69,9 +73,44 @@ function findUnitsAndShowSetting(req,res,isUpdate){
 		req.session.units = units;
 
 		console.log( "successMessae:"+successMessae );
-		res.render('setting', { title: '裝置設定',
+		res.render('editDevice', { title: '裝置編輯',
 			user:req.session.user,
 			units:units,
+			success: successMessae,
+			error: errorMessae
+		});
+	});
+}
+
+function findUnitsAndShowNotify(req,res,isUpdate){
+	UnitDbTools.findAllUnits(function(err,units){
+		var successMessae,errorMessae;
+		var allInfos = JsonFileTools.getJsonFromFile(infoPath);
+		var selectedType = req.flash('type').toString();
+		var typeKeys = Object.keys(allInfos);
+		//console.log(typeKeys.indexOf(selectedType));
+		if(typeKeys.indexOf(selectedType) === -1){//Can't find info with selected type
+			selectedType = typeKeys[0];
+		}
+		var info = allInfos[selectedType];
+		var keys = Object.keys(info.fieldName);
+		
+		console.log( "notify:"+info.fieldName[keys[0]]['notify'] );
+		if(err){
+			errorMessae = err;
+		}else{
+			if(units.length>0){
+				successMessae = '查詢到'+units.length+'筆資料';
+			}
+		}
+		req.session.units = units;
+
+		console.log( "successMessae:"+successMessae );
+		res.render('editNotify', { title: '通知設定',
+			user:req.session.user,
+			units:units,
+			info:info,
+			selectedType:selectedType,
 			success: successMessae,
 			error: errorMessae
 		});
@@ -392,14 +431,14 @@ module.exports = function(app){
 		return res.redirect('/find');
   	});*/
 
-  	app.get('/setting', checkLogin);
-	app.get('/setting', function (req, res) {
-		console.log('render to setting.ejs');
+  app.get('/editDevice', checkLogin);
+  app.get('/editDevice', function (req, res) {
+	    console.log('render to setting.ejs');
 		findUnitsAndShowSetting(req,res,true);
   });
 
-  app.post('/setting', checkLogin);
-  app.post('/setting', function (req, res) {
+  app.post('/editDevice', checkLogin);
+  app.post('/editDevice', function (req, res) {
 		var	post_mac = req.body.mac;
 		var post_name = req.body.name;
 		var post_type = req.body.type_option;
@@ -446,6 +485,39 @@ module.exports = function(app){
 				findUnitsAndShowSetting(req,res,false);
 			});
 		}
+  	});
+
+  app.get('/editNotify', checkLogin);
+  app.get('/editNotify', function (req, res) {
+	    console.log('render to setting.ejs');
+		findUnitsAndShowNotify(req,res);
+  });
+
+  app.post('/editNotify', checkLogin);
+  app.post('/editNotify', function (req, res) {
+		var	mode = req.body.mode;
+		var	type = req.body.type;
+
+		if(mode === 'save'){
+			var max = req.body.max;
+			var min = req.body.min;
+			var maxInfo = req.body.maxInfo;
+			var minInfo = req.body.minInfo;
+			console.log('Debug find mode :'+mode);
+			console.log('Debug find type :'+type);
+			console.log('Debug find max :'+JSON.stringify(max));
+			console.log('Debug find min :'+JSON.stringify(min));
+			console.log('Debug find maxInfo :'+JSON.stringify(maxInfo));
+			console.log('Debug find minInfo :'+JSON.stringify(minInfo));
+			var allInfos = JsonFileTools.getJsonFromFile(infoPath);
+			var info = allInfos[type];
+			info = changeTYpe(max,min,maxInfo,minInfo,info);
+			allInfos[type] = info;
+			JsonFileTools.saveJsonToFile(infoPath,allInfos);
+		}
+		req.flash('mode', mode);
+		req.flash('type', type);
+		return res.redirect('/editNotify');
   	});
 
    app.get('/info', checkLogin);
@@ -654,4 +726,40 @@ function checkNotLogin(req, res, next) {
   }else{
 	  next();
   }
+}
+
+function changeTYpe(max,min,maxInfo,minInfo,info){
+	var keys = Object.keys(info.fieldName);
+
+	if(info.notify === undefined){
+		info.notify = {};
+	}
+
+	for(var i = 0;i<max.length;i++){
+
+		if(info.notify[keys[i]] === undefined){
+			info.notify[keys[i]] = {};
+		}
+		if(max[i] != '' ){
+			info.notify[keys[i]]['max'] = max[i];
+		}else if(info.notify[keys[i]]['max'] !== undefined){
+			delete info.notify[keys[i]]['max'];
+		}
+		if(min[i] != '' ){
+			info.notify[keys[i]]['min'] = min[i];
+		}else if(info.notify[keys[i]]['min'] !== undefined){
+			delete info.notify[keys[i]]['min'];
+		}
+		if(maxInfo[i] != '' ){
+			info.notify[keys[i]]['maxInfo'] = maxInfo[i];
+		}else if(info.notify[keys[i]]['maxInfo'] !== undefined){
+			delete info.notify[keys[i]]['maxInfo'];
+		}
+		if(minInfo[i] != '' ){
+			info.notify[keys[i]]['minInfo'] = minInfo[i];
+		}else if(info.notify[keys[i]]['minInfo'] !== undefined){
+			delete info.notify[keys[i]]['minInfo'];
+		}
+	}
+	return info;
 }
