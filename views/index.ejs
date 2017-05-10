@@ -9,7 +9,13 @@
                             <i class="fa fa-list fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="huge"><%= units.length%></div>
+                            <div class="huge">
+                                <% if(units) {%>
+                                    <%= units.length%>
+                                <% } else { %>
+                                    0
+                                <%} %>
+                            </div>
                             <div>已加入裝置</div>
                         </div>
                     </div>
@@ -31,7 +37,13 @@
                             <i class="fa fa-user fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="huge">2</div>
+                            <div class="huge">
+                                <% if(deviceList) {%>
+                                    <%= deviceList.length%>
+                                <% } else { %>
+                                    0
+                                <%} %>
+                            </div>
                             <div>已加入帳號</div>
                         </div>
                     </div>
@@ -72,7 +84,7 @@
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <i class="fa fa-exclamation-triangle fa-5x"></i>
+                            <i class="fa fa-bell fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
                             <div class="huge">1</div>
@@ -112,18 +124,28 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="success">
-                                    <td>土壤水分裝置@展示間</td>
-                                    <td>土壤溫濕度檢測</td>
-                                    <td>2017/05/08 13:15:11</td>
-                                    <td>OK</td>
-                                </tr>
-                                <tr class="danger">
-                                    <td>微型氣象裝置@花蓮</td>
-                                    <td>氣象檢測</td>
-                                    <td>2017/04/08 13:15:11</td>
-                                    <td>失聯</td>
-                                </tr>
+                                <% for(var k in deviceList){ %>
+                                    <% if(deviceList[k][3] === '正常'){ %>
+                                        <tr class="success">
+                                    <% } else if(deviceList[k][3] === '電量太低'){ %>
+                                         <tr class="danger">
+                                    <% }else{ %>
+                                         <tr class="active">
+                                     <% } %>
+                                        <td >
+                                            <%= deviceList[k][0] %>
+                                        </td>
+                                        <td >
+                                            <%= deviceList[k][1] %>
+                                        </td>
+                                        <td >
+                                            <%= deviceList[k][2] %>
+                                        </td>
+                                        <td >
+                                            <%= deviceList[k][3] %>
+                                        </td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                         </table>
                         <div class="col-lg-8">
@@ -138,7 +160,7 @@
             <!-- /.panel -->
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <i class="fa fa-sliders fa-fw"></i> 裝置設定
+                    <i class="fa fa-sliders fa-fw"></i> 通知設定
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
@@ -149,7 +171,7 @@
 
                             <div class="panel panel-default">
                                 <div class="panel-heading">
-                                    <i class="fa fa-clock-o fa-fw"></i><%= notifyList[j]['typeName'] %>
+                                    <i class="fa fa-shield fa-fw"></i><%= notifyList[j]['typeName'] %>
                                 </div>
                                 <div class="panel-body">
                                     <table  class="table table-bordered table-hover table-striped">

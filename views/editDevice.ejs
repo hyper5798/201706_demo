@@ -7,32 +7,51 @@
 						<form id="editDevice" class="form-horizontal" action="" method="post">
 							<fieldset>
 								<!-- Name input-->
-								<div class="col-md-6 column">
+								<div class="col-md-4 column">
 									<div class="form-group">
-										<label class="col-md-3 control-label" for="name">裝置名稱</label>
-										<div class="col-md-9">
+										<label class="col-md-4 control-label" for="name">裝置名稱</label>
+										<div class="col-md-8">
 										<input id="name" name="name" type="text" placeholder="請輸入裝置名稱"  class="form-control" required/>
 										</div>
 									</div>
 
 									<!-- Email input-->
 									<div class="form-group">
-										<label class="col-md-3 control-label" for="email">裝置MAC</label>
-										<div class="col-md-9">
+										<label class="col-md-4 control-label" for="email">裝置MAC</label>
+										<div class="col-md-8">
 											<input id="mac" name="mac" type="text" placeholder="請輸入裝置MAC" class="form-control" required/>
 										</div>
 									</div>
 								</div>
-								<div class="col-md-6 column">
-									<!-- Type select-->
+								<div class="col-md-4 column">
+									<div>
+										<div class="form-group">
+											<label class="col-md-4 control-label" for="name">逾時設定</label>
+											<div class="col-md-8">
+												<input id="overtime" name="overtime" type="number" placeholder="預設2小時" class="form-control" required/>
+											</div>
+										</div>
+									</div>
 									<div >
-										<label class="col-md-4 control-label" for="type">裝置類型</label>
-										<div class="col-md-8">
-											<select id="type_option" name="type_option" >
-							                    <option value="aa00">土壤溫濕度檢測</option>
-							                    <option value="aa01">氣象檢測</option>
-							                    <option value="aa03">PM2.5檢測</option>
-							                </select>
+										<div class="form-group">
+											<label class="col-md-4 control-label" for="name">選擇類型</label>
+											<div class="col-md-8">
+												<select id="type_option" name="type_option" >
+								                    <option value="aa00">土壤溫濕度檢測</option>
+								                    <option value="aa01">氣象檢測</option>
+								                    <option value="aa03">PM2.5檢測</option>
+								                </select>
+											</div>
+										</div>
+									</div>
+
+								</div>
+								<div class="col-md-4 column">
+									<!-- Type select-->
+									<div>
+										<div class="form-group">
+											<label class="col-md-4 control-label" >&nbsp;</label>
+
 										</div>
 									</div>
 									<div class="form-group">
@@ -58,8 +77,10 @@
 										<input id="mode" name="mode" type="hidden" value="new">
 										<input id="postMac" name="postMac" type="hidden"">
 										<input id="typeString" name="typeString" type="hidden" value ="土壤溫濕度檢測" >
+										<input id="units" name="units" type="hidden" value="<%= JSON.stringify(units) %>">
 									</div>
 								</div>
+
 
 							</fieldset>
 						</form>
@@ -153,26 +174,32 @@
 
 <script class="code" type="text/javascript">
 	$(document).ready(function () {
-		setTimeout(function(){
+		/*setTimeout(function(){
 		    //do what you need here
-		    document.getElementById('error_message').innerText = '';
-		}, 3000);
+		    if(document.getElementById('error_message')){
+		    	document.getElementById('error_message').innerText = '';
+		    }
+		}, 3000);*/
 		$("#edit").hide();
 		$("#del").hide();
 	});
-	 var unitList={};
-
+	 var unitsValue = document.getElementById('units').value;
+	 var unitList= JSON.parse(unitsValue);
+	 console.log('units = '+ unitsValue);
 
 	/*$(document).on("click","tr.rows td", function(e){
 	    alert(e.target.innerHTML);
 	});*/
 	$(function(){
         $('.rows').click(function(){
+
             var index = $(this).index();
             var unit = unitList[index];
-            //alert('row index = '+  unitList[$row].name);
+            console.log('Click row index = '+  index);
+            console.log('unit = '+  JSON.stringify(unit));
             $('#name').val(unit.name);
             $('#mac').val(unit.macAddr);
+            $('#overtime').val(unit.overtime);
             var postMac = document.getElementById("postMac");
             postMac.value = unit.macAddr;
 
@@ -198,17 +225,6 @@
 			$("#del").show();
 			$("#new").hide();
 	    });
-    });
-
-
-    var socket = io.connect();
-	socket.on('connect',function(){
-        socket.emit('setting_client','hello,setting_client socket cient is ready');
-    });
-
-    socket.on('setting_client_unitlist',function(data){
-        //alert('name[0] :'+data[0].name);
-        unitList = data;
     });
 
 	$("form").submit(function () {

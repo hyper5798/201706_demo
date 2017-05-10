@@ -255,36 +255,6 @@ sock.on('connection',function(client){
 
 	});
 
-	client.on('setting_client',function(data){
-		console.log('Debug setting client------------------------------------------------------------start' );
-		console.log('Debug setting client :' + data );
-		UnitDbTools.findAllUnits(function(err,units){
-	  		if(err){
-	  			console.log('Debug setting client :' + err );
-	  		}else{
-	  			client.emit('setting_client_unitlist',units);
-	  		}
-  		});
-	});
-
-	client.on('setting_client_new',function(data){
-		console.log('Debug setting client------------------------------------------------------------start' );
-		console.log('Debug setting client :' + data.mac );
-		var index = macList.indexOf(data.mac);
-		if (index == -1) {
-			macList.push(data.mac);
-		}
-	});
-
-	client.on('setting_client_del',function(data){
-		console.log('Debug setting client------------------------------------------------------------start' );
-		console.log('Debug setting client :' + data.mac );
-		var index = macList.indexOf(data.mac);
-		if (index > -1) {
-			macList.splice(index, 1);
-		}
-	});
-
 	client.on('control_client',function(data){
 		console.log('Debug control_client ------------------------------------------------------------start' );
 		console.log(moment().format('YYYY-MM_DD HH:mm:ss')+' Debug giot_client :' + data );

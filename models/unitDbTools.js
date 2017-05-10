@@ -2,7 +2,7 @@
 var UnitModel = require('./unit.js');
 var moment = require('moment');
 
-exports.saveUnit = function (macAddress,name,type,typeString,callback) {
+exports.saveUnit = function (macAddress,name,type,typeString,overtime,callback) {
     console.log(moment().format('YYYY-MM-DD HH:mm:ss')+' Debug : saveUnit()');
 	var time = {
 		date   : moment().format("YYYY-MM-DD HH:mm:ss"),
@@ -22,7 +22,8 @@ exports.saveUnit = function (macAddress,name,type,typeString,callback) {
   		name       : name,
 		status     : 0,
 		update_at  : time,
-		created_at : new Date()
+		created_at : new Date(),
+		overtime   : overtime
 	});
     newUnit.save(function(err){
 		if(err){
@@ -34,7 +35,7 @@ exports.saveUnit = function (macAddress,name,type,typeString,callback) {
 	});
 };
 
-function toUpdateUint(type,find_mac,name,status,typeString,calllback) {
+function toUpdateUint(type,find_mac,name,status,typeString,overtime,calllback) {
     console.log(moment().format('YYYY-MM-DD HH:mm:ss')+' Debug : toUpdateUint()');
     console.log('Debug : update Unit mac='+find_mac+" , name ="+name);
 	var time = {
@@ -68,12 +69,13 @@ function toUpdateUint(type,find_mac,name,status,typeString,calllback) {
 				}
 			}
 			if(status != null ){
-				console.log('units[0].name : '+units[0].name);
 				JSON.status = status;
 			}
 			if(typeString){
-				console.log('units[0].name : '+units[0].name);
 				JSON.typeString = typeString;
+			}
+			if(overtime){
+				JSON.overtime = overtime;
 			}
 			var unitId = units[0]._id;
 			//console.log('Debug : getUnitId device ' + units);
@@ -106,26 +108,26 @@ function toUpdateUint(type,find_mac,name,status,typeString,calllback) {
 *Update unit status
 */
 exports.updateUnitStatus = function (mac,status,calllback) {
-    return toUpdateUint(null,mac,null,status,null,calllback);
+    return toUpdateUint(null,mac,null,status,null,null,calllback);
 };
 
 /*
 *Update unit name
 */
 exports.updateUnitName = function (mac,name,calllback) {
-    return toUpdateUint(null,mac,name,null,null,calllback);
+    return toUpdateUint(null,mac,name,null,null,null,calllback);
 };
 
 /*
 *Update unit name,date,type,status
 */
-exports.updateUnit = function (type,find_mac,name,status,typeString,calllback) {
-    return toUpdateUint(type,find_mac,name,status,typeString,calllback);
+exports.updateUnit = function (type,find_mac,name,status,typeString,overtime,calllback) {
+    return toUpdateUint(type,find_mac,name,status,typeString,overtime,calllback);
 };
 
 /*
 *Remove all of unit
-*Return -1:資�?存�??�誤 0:?�除完�? 1:?�除失�?
+*Return -1:
 */
 exports.removeAllUnits = function (calllback) {
     UnitModel.remove({}, (err)=>{

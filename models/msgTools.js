@@ -12,7 +12,8 @@ var overtime = 24;
 var hour = 60*60*1000;
 var isNeedGWMac = settings.isNeedGWMac;//For blazing
 //Save data to file path
-var path = './public/data/finalList.json';
+var finalPath = './public/data/finalList.json';
+
 
 //Save data
 var finalList = {};
@@ -25,6 +26,7 @@ function init(){
             return;
         console.log('lists[0] :\n'+JSON.stringify(lists[0]));
         finalList = lists[0].list;
+        saveFinalListToFile();
     });
 }
 
@@ -106,11 +108,12 @@ exports.getFinalList = function () {
     return finalList;
 }
 
-exports.saveFinalListToFile = function () {
+function saveFinalListToFile() {
     /*var json = JSON.stringify(finalList);
-    fs.writeFile(path, json, 'utf8');*/
-    JsonFileTools.saveJsonToFile(path,finalList);
+    fs.writeFile(finalPath, json, 'utf8');*/
+    JsonFileTools.saveJsonToFile(finalPath,finalList);
 }
+exports.saveFinalListToFile = saveFinalListToFile;
 
 exports.getDevicesData = function (devices) {
     var array = [];

@@ -10,6 +10,8 @@ var moment = require('moment');
 var noWeatherDevice = true;
 var finalList = {};
 var infoPath = './public/data/deviceInfos.json';
+var finalPath = './public/data/finalList.json';
+
 
 var hour = 60*60*1000;
 
@@ -128,11 +130,13 @@ module.exports = function(app){
 		}
 		req.session.units = units;
 		var notify = getNotifyList();
+		var deviceList = getDeviceList(units);
 		res.render('index', { title: '首頁',
 			user:req.session.user,
 			units:units,
 			notifyNumber:notify[0],
-			notifyList:notify[1]
+			notifyList:notify[1],
+			deviceList:deviceList
 		});
 	});
   });
@@ -447,12 +451,18 @@ module.exports = function(app){
 		var post_type = req.body.type_option;
 		var post_mode = req.body.mode;
 		var typeString = req.body.typeString;
+		if(req.body.overtime === undefined || req.body.overtime === ''){
+			var overtime = 2;
+		}else{
+			var overtime = Number(req.body.overtime);
+		}
+		
 		console.log('mode : '+post_mode);
 		if(post_mode == 'new'){
 			if(	post_mac && post_name && post_mac.length==8 && post_name.length>=1){
 				console.log('post_mac:'+post_mac);
 				console.log('post_name:'+post_name);
-				UnitDbTools.saveUnit(post_mac,post_name,post_type,typeString,function(err,result){
+				UnitDbTools.saveUnit(post_mac,post_name,post_type,typeString,overtime,function(err,result){
 					if(err){
 						req.flash('error', err);
 						return res.redirect('/setting');
@@ -477,7 +487,7 @@ module.exports = function(app){
 
 		}else{//Edit mode
 			post_mac = req.body.postMac;
-			UnitDbTools.updateUnit(post_type,post_mac,post_name,null,typeString,function(err,result){
+			UnitDbTools.updateUnit(post_type,post_mac,post_name,null,typeString,overtime,function(err,result){
 				if(err){
 					req.flash('error', err);
 					console.log('edit  :'+post_mac + err);
@@ -835,4 +845,37 @@ function getNotify(info){
 		}
 	}
 	return [number,json];
+}
+
+function getDeviceList(units){
+	
+	var finalJson = JsonFileTools.getJsonFromFile(finalPath);
+	var arr = [];
+	for(var key in units){
+		arr.push(getInfo(units[key],finalJson[units[key].macAddr]));
+	}
+	return arr;
+}
+
+function getInfo(unit,data){
+	var arr = [];
+	arr.push(unit.name);
+	arr.push(unit.typeString);
+	arr.push(data.date);
+	var now = new Date();
+	now = now.getTime();
+	var mTimestamp = new Date(data.recv);
+	mTimestamp = mTimestamp.getTime();
+	var diff = (now - mTimestamp)/hour;
+	console.log(unit.name+' : overtime ='+unit.overtime+' , diff = '+diff);
+	if(data.information.voltage && data.information.voltage < 350){
+		console.log(unit.name+' : voltage ='+data.information.voltage);
+		arr.push('電量太低');
+	}else if(diff<= unit.overtime ){
+		arr.push('正常');
+	}else{
+		arr.push('失聯');
+	}
+
+	return arr;
 }

@@ -9,7 +9,8 @@ var unitSchema = new Schema({
   name: { type: String},
   status:{ type: Number},
   update_at: { type: Schema.Types.Mixed},
-  created_at: { type: Date}
+  created_at: { type: Date},
+  overtime:{ type: Number}
 });
 
 // the schema is useless so far
