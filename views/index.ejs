@@ -1,12 +1,12 @@
 <%- include page/header %>
 <!--<meta http-equiv="refresh" content="3600">-->
-	<div class="row">
+    <div class="row">
         <div class="col-lg-3 col-md-6">
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <i class="fa fa-search fa-5x"></i>
+                            <i class="fa fa-list fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
                             <div class="huge"><%= units.length%></div>
@@ -53,7 +53,7 @@
                             <i class="fa fa-sliders fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="huge">1</div>
+                            <div class="huge"><%= notifyNumber %></div>
                             <div>通知設定</div>
                         </div>
                     </div>
@@ -138,19 +138,51 @@
             <!-- /.panel -->
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <i class="fa fa-clock-o fa-fw"></i> 裝置設定
+                    <i class="fa fa-sliders fa-fw"></i> 裝置設定
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
+                    <% if(notifyList){ %>
 
-					<div class="timeline-panel">
-                                <div class="timeline-heading">
-                                    <h4 class="timeline-title">Lorem ipsum dolor</h4>
+                        <% for(var j in notifyList){ %>
+                            <% var notify = notifyList[j]['notify']; %>
+
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <i class="fa fa-clock-o fa-fw"></i><%= notifyList[j]['typeName'] %>
                                 </div>
-                                <div class="timeline-body">
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deserunt obcaecati, quaerat tempore officia voluptas debitis consectetur culpa amet, accusamus dolorum fugiat, animi dicta aperiam, enim incidunt quisquam maxime neque eaque.</p>
+                                <div class="panel-body">
+                                    <table  class="table table-bordered table-hover table-striped">
+                                        <thead>
+                                            <tr class="info">
+                                                <th width="20%">設定內容</th>
+                                                <th width="20%">設定值</th>
+                                                <th width="60%">通知提示</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% for(var k in notify){ %>
+                                                <tr>
+                                                    <td>
+                                                        <%= notify[k][0] %>
+                                                    </td>
+                                                    <td >
+                                                        <%= notify[k][1] %>
+                                                    </td>
+                                                    <td >
+                                                        <%= notify[k][2] %>
+                                                    </td>
+                                                </tr>
+                                            <% } %>
+                                        </tbody>
+                                    </table>
                                 </div>
+                                <!-- /.panel-body -->
                             </div>
+                            <!-- /.panel -->
+                        <% } %>
+                    <% } %>
+
 
                 </div>
                 <!-- /.panel-body -->
@@ -180,7 +212,7 @@
             <!-- /.panel -->
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <i class="fa fa-bell fa-fw"></i> 帳戶列表
+                    <i class="fa fa-user fa-fw"></i> 帳戶列表
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">

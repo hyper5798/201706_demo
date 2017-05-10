@@ -40,8 +40,8 @@
 				                                <tr class="info">
 				                                    <th>名稱</th>
 				                                    <th>最大值</th>
-				                                    <th>最小值</th>
 				                                    <th>最大值提示</th>
+				                                    <th>最小值</th>
 				                                    <th>最小值提示</th>
 				                                </tr>
 				                            </thead>
@@ -57,29 +57,29 @@
 					                                    	<% if(info.notify && info.notify[keys[j]]['max']){ %>
 					                                    		<input name="max" type="number" value="<%= info.notify[keys[j]]['max'] %>" />
 					                                    	<% } else { %>
-					                                    		<input name="max" type="number" placeholder="請輸入通知最大值" />
+					                                    		<input name="max" type="number" placeholder="" />
 					                                    	<% } %>
-					                                    </td>
-					                                    <td>
-					                                    	<% if(info.notify && info.notify[keys[j]]['min']){ %>
-					                                    		<input name="min" type="number" value="<%= info.notify[keys[j]]['min'] %>" />
-					                                    	<% } else { %>
-					                                    		<input name="min" type="number" placeholder="請輸入通知最小值" />
-					                                    	<% } %>
-
 					                                    </td>
 					                                    <td>
 					                                    	<% if(info.notify && info.notify[keys[j]]['maxInfo']){ %>
 					                                    		<input name="maxInfo" type="text" value="<%= info.notify[keys[j]]['maxInfo'] %>" />
 					                                    	<% } else { %>
-					                                    		<input name="maxInfo" type="text" placeholder="大於最大值提示" />
+					                                    		<input name="maxInfo" type="text" placeholder="" />
 					                                    	<% } %>
+					                                    </td>
+					                                     <td>
+					                                    	<% if(info.notify && info.notify[keys[j]]['min']){ %>
+					                                    		<input name="min" type="number" value="<%= info.notify[keys[j]]['min'] %>" />
+					                                    	<% } else { %>
+					                                    		<input name="min" type="number" placeholder="" />
+					                                    	<% } %>
+
 					                                    </td>
 					                                    <td>
 					                                    	<% if(info.notify && info.notify[keys[j]]['minInfo']){ %>
 					                                    		<input name="minInfo" type="text" value="<%= info.notify[keys[j]]['minInfo'] %>" />
 					                                    	<% } else { %>
-					                                    		<input name="minInfo" type="textr" placeholder="小於最小值提示" />
+					                                    		<input name="minInfo" type="textr" placeholder="" />
 					                                    	<% } %>
 					                                    </td>
 					                            </tbody>
@@ -177,7 +177,7 @@
 	}
 
 	function changeType(value){
-		alert('selecte type:'+value);
+		//alert('selecte type:'+value);
 		$("#mode").val("changeType");
 		$("#type").val(value);
 		document.getElementById("editNotify").submit();

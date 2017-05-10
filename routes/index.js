@@ -94,7 +94,7 @@ function findUnitsAndShowNotify(req,res,isUpdate){
 		}
 		var info = allInfos[selectedType];
 		var keys = Object.keys(info.fieldName);
-		
+
 		console.log( "notify:"+info.fieldName[keys[0]]['notify'] );
 		if(err){
 			errorMessae = err;
@@ -127,9 +127,12 @@ module.exports = function(app){
 			req.session.units = [];
 		}
 		req.session.units = units;
+		var notify = getNotifyList();
 		res.render('index', { title: '首頁',
 			user:req.session.user,
-			units:req.session.units
+			units:units,
+			notifyNumber:notify[0],
+			notifyList:notify[1]
 		});
 	});
   });
@@ -511,7 +514,7 @@ module.exports = function(app){
 			console.log('Debug find minInfo :'+JSON.stringify(minInfo));
 			var allInfos = JsonFileTools.getJsonFromFile(infoPath);
 			var info = allInfos[type];
-			info = changeTYpe(max,min,maxInfo,minInfo,info);
+			info = changeNotify(max,min,maxInfo,minInfo,info);
 			allInfos[type] = info;
 			JsonFileTools.saveJsonToFile(infoPath,allInfos);
 		}
@@ -728,8 +731,11 @@ function checkNotLogin(req, res, next) {
   }
 }
 
-function changeTYpe(max,min,maxInfo,minInfo,info){
+
+//For save notify in edit notify
+function changeNotify(max,min,maxInfo,minInfo,info){
 	var keys = Object.keys(info.fieldName);
+	var isNoSetting = true;
 
 	if(info.notify === undefined){
 		info.notify = {};
@@ -741,25 +747,92 @@ function changeTYpe(max,min,maxInfo,minInfo,info){
 			info.notify[keys[i]] = {};
 		}
 		if(max[i] != '' ){
+			isNoSetting =false;
 			info.notify[keys[i]]['max'] = max[i];
-		}else if(info.notify[keys[i]]['max'] !== undefined){
-			delete info.notify[keys[i]]['max'];
+			if(maxInfo[i] != '' ){
+				info.notify[keys[i]]['maxInfo'] = maxInfo[i];
+			}else {
+				info.notify[keys[i]]['maxInfo'] = info.fieldName[keys[i]]+'超過最大值';
+			}
+		}else {
+			if(info.notify[keys[i]]['max'] !== undefined){
+				delete info.notify[keys[i]]['max'];
+			}
+			if(info.notify[keys[i]]['maxInfo'] !== undefined){
+				delete info.notify[keys[i]]['maxInfo'];
+			}
+			
 		}
 		if(min[i] != '' ){
+			isNoSetting = false;
 			info.notify[keys[i]]['min'] = min[i];
-		}else if(info.notify[keys[i]]['min'] !== undefined){
-			delete info.notify[keys[i]]['min'];
+			if(minInfo[i] != '' ){
+				info.notify[keys[i]]['minInfo'] = minInfo[i];
+			}else {
+				info.notify[keys[i]]['minInfo'] = info.fieldName[keys[i]]+'低於最小值';
+			}
+		}else {
+			if(info.notify[keys[i]]['min'] !== undefined){
+				delete info.notify[keys[i]]['min'];
+			}
+			if(info.notify[keys[i]]['minInfo'] !== undefined){
+				delete info.notify[keys[i]]['minInfo'];
+			}
 		}
-		if(maxInfo[i] != '' ){
-			info.notify[keys[i]]['maxInfo'] = maxInfo[i];
-		}else if(info.notify[keys[i]]['maxInfo'] !== undefined){
-			delete info.notify[keys[i]]['maxInfo'];
-		}
-		if(minInfo[i] != '' ){
-			info.notify[keys[i]]['minInfo'] = minInfo[i];
-		}else if(info.notify[keys[i]]['minInfo'] !== undefined){
-			delete info.notify[keys[i]]['minInfo'];
-		}
+		/*if(flag === false){//No setting then remove setting json
+			delete info.notify[keys[i]];
+		}*/
+	}
+	var keys2 = Object.keys(info.notify);
+	if(isNoSetting){
+		delete info.notify;
 	}
 	return info;
+}
+
+//For get notify list in index
+function getNotifyList(){
+
+	var allInfos = JsonFileTools.getJsonFromFile(infoPath);
+	var keys = Object.keys(allInfos);
+	var arr = [];
+	var number = 0;
+
+	for(var i = 0;i<keys.length;i++){
+		if(allInfos[keys[i]]['notify']){
+			var mArr = getNotify(allInfos[keys[i]]);
+			number = number + mArr[0];
+			arr.push(mArr[1]);
+		}
+	}
+	return [number,arr];
+}
+
+
+//For get notify  in index
+function getNotify(info){
+	var json = {};
+	var number = 0;
+	json.typeName = info.typeName;
+	json.notify = [];
+	var keys = Object.keys(info.notify);
+	for(var i = 0;i<keys.length;i++){
+		if(info.notify[keys[i]]['max']){
+			number++;
+			if(info.notify[keys[i]]['maxInfo']){
+				json.notify.push([info.fieldName[keys[i]]+'最大值',info.notify[keys[i]]['max'],info.notify[keys[i]]['maxInfo']]);
+			}else{
+				json.notify.push([info.fieldName[keys[i]]+'最大值',info.notify[keys[i]]['max'],'']);
+			}
+		}
+		if(info.notify[keys[i]]['min']){
+			number++;
+			if(info.notify[keys[i]]['minInfo']){
+				json.notify.push([info.fieldName[keys[i]]+'最小值',info.notify[keys[i]]['min'],info.notify[keys[i]]['minInfo']]);
+			}else{
+				json.notify.push([info.fieldName[keys[i]]+'最小值',info.notify[keys[i]]['min'],'']);
+			}
+		}
+	}
+	return [number,json];
 }
