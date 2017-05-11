@@ -80,11 +80,13 @@ exports.parseMsg = function (msg) {
     }
 
     saveToDB(msg,finalList);
+    saveFinalListToFile();
 
     return msg;
 }
 
 function saveToDB(obj,list){
+    
     listDbTools.updateList('finalList',list,function(err,info){
         if(err){
             console.log("supdateList Error :"+saveDeviceMsg);
