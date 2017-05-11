@@ -10,6 +10,7 @@ var flash = require('connect-flash');
 var settings = require('./settings');
 var routes = require('./routes/index');
 var todos = require('./routes/todos');//Jason add on 2016.09.26
+var webhook = require('./routes/webhook');//Jason add on 2016.09.26
 var moment = require('moment');
 var http = require('http'),
     https = require('https');
@@ -31,7 +32,7 @@ var async = require('async');
 
 //app setting-------------------------------------------------------
 var app = express();
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 80;
 app.set('port', port);
 app.set('httpsport', 8080);
 
@@ -57,6 +58,7 @@ app.use(express.static(path.join(__dirname, 'bower_components/jquery-validation/
 app.use(express.static(path.join(__dirname, 'bower_components/jquery-validation/src/')));
 
 app.use('/todos', todos);
+app.use('/webhook', webhook);
 //
 routes(app);
 var server = http.createServer(app);

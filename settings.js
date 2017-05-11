@@ -11,5 +11,7 @@ module.exports = {
   name: '200000206',
   pw: '02259101',
   gIoTopic:'client/200000206/200000206-GIOT-MAKER',
-  debug:true
+  debug:true,
+  verify_token:'EAAZAUEZCqWVsABAKczbXolA9ElqDIDysFFjII7XxRoHS6ytVbKw8jaIOgIyeGir0qZCFZBm2kbSlYNXO3xSfoAsB712qf3KZB7Dle6ocE3xVoIuuTnxvvlDDWkqHudRYH4x9WwuMYOmFRRNMg40yTWQmSnjFEepoePLJdoqLwxAZDZD',
+  page_token:'EAAZAUEZCqWVsABAKczbXolA9ElqDIDysFFjII7XxRoHS6ytVbKw8jaIOgIyeGir0qZCFZBm2kbSlYNXO3xSfoAsB712qf3KZB7Dle6ocE3xVoIuuTnxvvlDDWkqHudRYH4x9WwuMYOmFRRNMg40yTWQmSnjFEepoePLJdoqLwxAZDZD'
 };
