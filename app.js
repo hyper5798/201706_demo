@@ -32,7 +32,7 @@ var async = require('async');
 
 //app setting-------------------------------------------------------
 var app = express();
-var port = process.env.PORT || 80;
+var port = process.env.PORT || 3000;
 app.set('port', port);
 app.set('httpsport', 8080);
 
@@ -102,7 +102,7 @@ app.use(settings.httpNodeRoot,RED.httpNode);
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
-  next(err);
+  res.render("404");
 });
 
 // error handlers
