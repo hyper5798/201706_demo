@@ -64,9 +64,6 @@ routes(app);
 var server = http.createServer(app);
 var httpsServer = https.createServer(ssl.options, app).listen(app.get('httpsport'));
 
-//Jason add for node-red on 2017.01.03
-// Create the settings object - see default settings.js file for other options
-var finalList = JsonFileTools.getJsonFromFile('./public/data/finalList.json');
 
 if(debug){
 	console.log('#########  Debug Mode #############');
@@ -81,7 +78,6 @@ var settings = {
     	deviceDbTools:require("./models/deviceDbTools.js"),
 		msgTools:require("./models/msgTools.js"),
 		listeDbTools:require("./models/listDbTools.js"),
-    	finalList:finalList,
     	debug:debug
     }    // enables global context
 };

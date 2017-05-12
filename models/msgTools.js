@@ -3,6 +3,7 @@ var ParseBlaziong =  require('./parseBlaziong.js');
 var ParseDefine =  require('./parseDefine.js');
 var JsonFileTools =  require('./jsonFileTools.js');
 var listDbTools =  require('./listDbTools.js');
+var log =  require('./log.js');
 var settings =  require('../settings.js');
 var debug = settings.debug;
 var deviceDbTools =  require('./deviceDbTools.js');
@@ -13,7 +14,10 @@ var hour = 60*60*1000;
 var isNeedGWMac = settings.isNeedGWMac;//For blazing
 //Save data to file path
 var finalPath = './public/data/finalList.json';
-
+var notifyPath = './public/data/notifyList.json';
+var infoPath = './public/data/deviceInfos.json';
+var unitPath = './public/data/unit.json';
+var logPath = './public/data/log.json';
 
 //Save data
 var finalList = {};
@@ -108,6 +112,102 @@ exports.setFinalList = function (list) {
 
 exports.getFinalList = function () {
     return finalList;
+}
+
+exports.getNotifyDMArray = function (parseData) {
+    
+    var deviceType = parseData.type;
+    var dataInfo = parseData.information;
+    var notifyInfos = JsonFileTools.getJsonFromFile(infoPath);
+    var unit = JsonFileTools.getJsonFromFile(unitPath);
+    var notifyInfo = notifyInfos[deviceType];
+    var time =  parseData.date;
+    var msg = getNotifyMessage(dataInfo,notifyInfo);
+    
+    
+    if(msg){
+        var deviceName = unit[parseData.mac];
+        
+        //save to DB & File
+        saveLog(deviceName,msg,parseData.recv);
+
+        var message =deviceName.concat(':') ;
+        message = message.concat(msg) ;
+        message = message.concat('\n') ;
+        message = message.concat(time) ;
+
+        var arr = [];
+        var limit = 10;
+        var notifyUsers = JsonFileTools.getJsonFromFile(notifyPath);
+        for(var i=0;i<limit;i++){
+            if(i<notifyUsers.length){
+                arr.push(getDM(notifyUsers[i],message));
+            }else{
+                arr.push(null);
+            }
+        }
+        return arr;
+    }else{
+        return null;
+    }
+}
+
+function getNotifyMessage(dataInfo,notifyInfo){
+    console.log('dataInfo:' + JSON.stringify(dataInfo));
+    console.log('notifyInfo:' + JSON.stringify(notifyInfo));
+    var msg = '';
+   
+    var notify = notifyInfo.notify;
+    var keys = Object.keys(notify);
+    for(var i in keys){
+        if(notify[keys[i]].max || notify[keys[i]].min){
+            var check = dataInfo[keys[i]];
+            
+            if(notify[keys[i]].max && check > notify[keys[i]].max){
+                var str = '('+notify[keys[i]].max+')';
+                msg = msg.concat(notify[keys[i]].maxInfo);
+                msg = msg.concat(str);
+                msg = msg.concat(settings.Segmentation);
+            }
+            if(notify[keys[i]].min && check < notify[keys[i]].min){
+                var str = '('+notify[keys[i]].min+')';
+                msg = msg.concat(notify[keys[i]].minInfo);
+                msg = msg.concat(str);
+                msg = msg.concat(settings.Segmentation);
+            }
+        }
+    }
+    if(msg !== ''){
+        msg = msg.slice(0, msg.length-1);
+        return msg;
+    }else{
+        return null;
+    }
+}
+
+function getDM(user,message){
+    var msg = {};
+    var str1 = 'D ';
+    var str2 = ' ';
+
+    str1=str1.concat(user);
+    str2=str2.concat(message); 
+    str1=str1.concat(str2);
+    msg= {"payload":str1};
+    return msg
+}
+
+function saveLog(deviceName,msg,recv){
+    var time =  moment().format("YYYY-MM-DD HH:mm:ss");
+    var json = {"type":"notify","subject":deviceName,"content":msg,"createdTime":time,"recv":recv};
+    log.saveLog(json,function(err,result){
+        if(!err){
+            delete json.type;
+            var log = JsonFileTools.getJsonFromFile(logPath);
+            log[json.createdTime] = json;
+            JsonFileTools.saveJsonToFile(logPath,log);
+        }
+    });
 }
 
 function saveFinalListToFile() {

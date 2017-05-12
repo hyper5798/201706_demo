@@ -87,7 +87,7 @@
                             <i class="fa fa-bell fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="huge">1</div>
+                            <div class="huge"><%= logs.length%></div>
                             <div>事件通知</div>
                         </div>
                     </div>
@@ -219,15 +219,21 @@
                 </div>
                 <!-- /.panel-heading -->
                 <div class="panel-body">
-                    <div class="list-group">
-                        <a href="#" class="list-group-item">
-                            <i class="fa fa-comment fa-fw"></i> New Comment
-                            <span class="pull-right text-muted small"><em>4 minutes ago</em>
-                            </span>
-                        </a>
-                    </div>
-                    <!-- /.list-group -->
-                    <!--<a href="#" class="btn btn-default btn-block">View All Alerts</a>-->
+
+                    <% if(logs) { %>
+                        <% for(var i in logs){ %>
+                            <div class="list-group">
+                                 <a href="/?time=<%= logs[i][2] %>" class="list-group-item">
+                                   <i class="fa fa-comment fa-fw"></i> <%= logs[i][0] %> : <%= logs[i][1] %>
+                                </a>
+
+                                <span class="pull-right text-muted small"><em><%= logs[i][2] %></em>
+                                </span>
+                            </div>
+                            <!-- /.list-group -->
+                        <% } %>
+                    <% } %>
+
                 </div>
                 <!-- /.panel-body -->
             </div>

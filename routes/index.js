@@ -5,12 +5,15 @@ var DeviceDbTools = require('../models/deviceDbTools.js');
 var UnitDbTools = require('../models/unitDbTools.js');
 var JsonFileTools =  require('../models/jsonFileTools.js');
 var UserDbTools =  require('../models/userDbTools.js');
+var log =  require('../models/log.js');
 var settings = require('../settings');
 var moment = require('moment');
 var noWeatherDevice = true;
 var finalList = {};
 var infoPath = './public/data/deviceInfos.json';
 var finalPath = './public/data/finalList.json';
+var logPath = './public/data/log.json';
+var unitPath = './public/data/unit.json';
 
 
 var hour = 60*60*1000;
@@ -122,6 +125,7 @@ function findUnitsAndShowNotify(req,res,isUpdate){
 module.exports = function(app){
   app.get('/', checkLogin);
   app.get('/', function (req, res) {
+	var time    = req.query.time;
 	UnitDbTools.findAllUnits(function(err,units){
 		var successMessae,errorMessae;
 		var macTypeMap = {};
@@ -130,13 +134,20 @@ module.exports = function(app){
 		}
 		req.session.units = units;
 		var notify = getNotifyList();
+		if(time){
+			toUpdateLogByTime(time);
+		}
+		var logs = getLogList(time);
+		
 		var deviceList = getDeviceList(units);
+		
 		res.render('index', { title: '首頁',
 			user:req.session.user,
 			units:units,
 			notifyNumber:notify[0],
 			notifyList:notify[1],
-			deviceList:deviceList
+			deviceList:deviceList,
+			logs:logs
 		});
 	});
   });
@@ -456,7 +467,7 @@ module.exports = function(app){
 		}else{
 			var overtime = Number(req.body.overtime);
 		}
-		
+
 		console.log('mode : '+post_mode);
 		if(post_mode == 'new'){
 			if(	post_mac && post_name && post_mac.length==8 && post_name.length>=1){
@@ -465,11 +476,12 @@ module.exports = function(app){
 				UnitDbTools.saveUnit(post_mac,post_name,post_type,typeString,overtime,function(err,result){
 					if(err){
 						req.flash('error', err);
-						return res.redirect('/setting');
+						return res.redirect('/editDevice');
 					}
+					saveUnit('new',post_mac,post_name);
 					findUnitsAndShowSetting(req,res,true);
 				});
-				return res.redirect('/setting');
+				return res.redirect('/editDevice');
 			}
 		}else if(post_mode == 'del'){//Delete mode
 			post_mac = req.body.postMac;
@@ -477,11 +489,12 @@ module.exports = function(app){
 				if(err){
 					req.flash('error', err);
 					console.log('removeUnitByMac :'+post_mac + err);
-					return res.redirect('/setting');
+					return res.redirect('/editDevice');
 				}else{
 					req.flash('error', err);
 					console.log('removeUnitByMac :'+post_mac + 'success');
 				}
+				saveUnit('del',post_mac,post_name);
 				findUnitsAndShowSetting(req,res,false);
 			});
 
@@ -491,10 +504,11 @@ module.exports = function(app){
 				if(err){
 					req.flash('error', err);
 					console.log('edit  :'+post_mac + err);
-					return res.redirect('/setting');
+					return res.redirect('/editDevice');
 				}else{
 					console.log('edit :'+post_mac + 'success');
 				}
+				saveUnit('edit',post_mac,post_name);
 				findUnitsAndShowSetting(req,res,false);
 			});
 		}
@@ -771,7 +785,7 @@ function changeNotify(max,min,maxInfo,minInfo,info){
 			if(info.notify[keys[i]]['maxInfo'] !== undefined){
 				delete info.notify[keys[i]]['maxInfo'];
 			}
-			
+
 		}
 		if(min[i] != '' ){
 			isNoSetting = false;
@@ -799,6 +813,31 @@ function changeNotify(max,min,maxInfo,minInfo,info){
 	}
 	return info;
 }
+
+function getLogList(time){
+	var allLogs = JsonFileTools.getJsonFromFile(logPath);
+	if(time){
+		delete allLogs[time];
+		if( allLogs === null || allLogs === undefined){
+			allLogs = {};
+		}
+		JsonFileTools.saveJsonToFile(logPath,allLogs);
+	}
+	var keys = Object.keys(allLogs);
+	var arr = [];
+	for(var i = 0;i<keys.length;i++){
+		if(allLogs[keys[i]]['subject']){
+			var mArr = [];
+			mArr.push(allLogs[keys[i]]['subject']);
+			mArr.push(allLogs[keys[i]]['content']);
+			mArr.push(allLogs[keys[i]]['createdTime']);
+			arr.push(mArr);
+		}
+	}
+	return arr;
+}
+
+
 
 //For get notify list in index
 function getNotifyList(){
@@ -848,7 +887,7 @@ function getNotify(info){
 }
 
 function getDeviceList(units){
-	
+
 	var finalJson = JsonFileTools.getJsonFromFile(finalPath);
 	var arr = [];
 	for(var key in units){
@@ -861,21 +900,41 @@ function getInfo(unit,data){
 	var arr = [];
 	arr.push(unit.name);
 	arr.push(unit.typeString);
-	arr.push(data.date);
-	var now = new Date();
-	now = now.getTime();
-	var mTimestamp = new Date(data.recv);
-	mTimestamp = mTimestamp.getTime();
-	var diff = (now - mTimestamp)/hour;
-	console.log(unit.name+' : overtime ='+unit.overtime+' , diff = '+diff);
-	if(data.information.voltage && data.information.voltage < 350){
-		console.log(unit.name+' : voltage ='+data.information.voltage);
-		arr.push('電量太低');
-	}else if(diff<= unit.overtime ){
-		arr.push('正常');
+	if(data){
+		arr.push(data.date);
+		var now = new Date();
+		now = now.getTime();
+		var mTimestamp = new Date(data.recv);
+		mTimestamp = mTimestamp.getTime();
+		var diff = (now - mTimestamp)/hour;
+		console.log(unit.name+' : overtime ='+unit.overtime+' , diff = '+diff);
+		if(data.information.voltage && data.information.voltage < 350){
+			console.log(unit.name+' : voltage ='+data.information.voltage);
+			arr.push('電量太低');
+		}else if(diff<= unit.overtime ){
+			arr.push('正常');
+		}else{
+			arr.push('失聯');
+		}
 	}else{
-		arr.push('失聯');
+		arr.push('無');
+		arr.push('未知');
 	}
-
 	return arr;
 }
+
+function saveUnit(mode,post_mac,post_name){
+	var allunits = JsonFileTools.getJsonFromFile(unitPath);
+	if(mode === 'del'){
+		delete allunits[post_mac];
+	}else{
+		allunits[post_mac] = post_name;
+	}
+	JsonFileTools.saveJsonToFile(unitPath,allunits);
+}
+
+function toUpdateLogByTime(time){
+	var json = {"type":"notify","createdTime":time};
+	log.updateLogByTime(time,function(err,result){});
+}
+

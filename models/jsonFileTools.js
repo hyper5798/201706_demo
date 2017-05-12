@@ -144,7 +144,7 @@ function getJaonFile(path){
         return null;
     }else{
         var text = fs.readFileSync(path, 'utf8');
-        console.log('read text :'+text);
+        //console.log('read text :'+text);
         if(text.length>0){
             var json = JSON.parse(text);
             return json;
