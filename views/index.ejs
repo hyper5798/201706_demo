@@ -38,8 +38,8 @@
                         </div>
                         <div class="col-xs-9 text-right">
                             <div class="huge">
-                                <% if(deviceList) {%>
-                                    <%= deviceList.length%>
+                                <% if(users) {%>
+                                    <%= users.length%>
                                 <% } else { %>
                                     0
                                 <%} %>
@@ -245,12 +245,14 @@
                 <!-- /.panel-heading -->
                 <div class="panel-body">
                     <div class="list-group">
-                        <a href="#" class="list-group-item">
-                            <i class="fa fa-user fa-fw"></i> Admin
-                        </a>
-                        <a href="#" class="list-group-item">
-                            <i class="fa fa-user fa-fw"></i> test
-                        </a>
+                        <% if (users) { %> 
+                            <% for (var key in users) { %> 
+                                <a href="#" class="list-group-item">
+                                    <i class="fa fa-user fa-fw"></i> <%= users[key] %>
+                                </a>
+                                
+                            <% } %>
+                        <% } %>
                     </div>
                     <!-- /.list-group -->
                     <!--<a href="#" class="btn btn-default btn-block">View All Alerts</a>-->

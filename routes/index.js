@@ -14,7 +14,7 @@ var infoPath = './public/data/deviceInfos.json';
 var finalPath = './public/data/finalList.json';
 var logPath = './public/data/log.json';
 var unitPath = './public/data/unit.json';
-
+var userPath = './public/data/user.json';
 
 var hour = 60*60*1000;
 
@@ -138,6 +138,8 @@ module.exports = function(app){
 		var notify = getNotifyList();
 		var logs = getLogList();
 		var deviceList = getDeviceList(units);
+		//Jason add for user info in index on 2017.05.15
+		var users = JsonFileTools.getJsonFromFile(userPath);
 		
 		res.render('index', { title: '首頁',
 			user:req.session.user,
@@ -145,7 +147,8 @@ module.exports = function(app){
 			notifyNumber:notify[0],
 			notifyList:notify[1],
 			deviceList:deviceList,
-			logs:logs
+			logs:logs,
+			users:users
 		});
 	});
   });
@@ -277,6 +280,11 @@ module.exports = function(app){
 							error: errorMessae
 						});
 					}
+					//Jason add for user info in index on 2017.05.15
+					var users = JsonFileTools.getJsonFromFile(userPath);
+					users.push(name);
+					JsonFileTools.saveJsonToFile(userPath,users);
+
 					UserDbTools.findUserByName(name,function(err,user){
 						if(user){
 							req.session.user = user;
@@ -669,6 +677,15 @@ module.exports = function(app){
 				UserDbTools.findAllUsers(function (err,users){
 					console.log('查詢到帳戶 :'+users.length);
 				});
+				//Jason add for user info in index on 2017.05.15
+				var users = JsonFileTools.getJsonFromFile(userPath);
+				var index = users.indexOf(post_name);
+
+				if (index > -1) {
+					users.splice(index, 1);
+				}
+				JsonFileTools.saveJsonToFile(userPath,users);
+
 				req.flash('refresh','delete');//For refresh users data
 				return res.redirect('/account');
 			});
