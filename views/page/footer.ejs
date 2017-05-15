@@ -3,7 +3,56 @@
 			</div> <!-- col-lg-12 -->
 		</div><!--/.row-->
 </div>	<!--/.main-->
+<!-- JQUERY -->
+<script src="js/jquery-1.12.4.js"></script>
+<!-- JQUERY-UI -->
+<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
+<!-- JQUERY-validate -->
+<script type="text/javascript" src="jquery.validate.min.js"></script>
+<script type="text/javascript" src="additional-methods.min.js"></script>
+<script type="text/javascript" src="/localization/messages_zh_TW.js"></script>
+<!-- bootstrap -->
+<script src="js/bootstrap.min.js"></script>
+<!-- socket.io -->
+<script src="/socket.io/socket.io.js"></script>
 
+<% if(title === '資料查詢' || title === '圖表分析'){ %>
+	<!--  jqplot -->
+    <script type="text/javascript"src="/js/jqplot/jquery.jqplot.min.js"></script>
+    <script type="text/javascript" src="/js/jqplot/plugins/jqplot.dateAxisRenderer.js"></script>
+	<!--  JSCal2-1.7-->
+	<script type="text/javascript" src="/vendor/JSCal2-1.7/js/jscal2.js"></script>
+	<script type="text/javascript" src="/vendor/JSCal2-1.7/js/lang/b5.js"></script>
+<% } %>
+
+<% if(title === '資料查詢'){ %>
+	<!-- JQUERY DataTables-->
+	<script type="text/javascript" src="vendor/DataTables-1.10.13/media/js/jquery.dataTables.min.js"></script>
+	<!-- Button DataTables-->
+	<script type="text/javascript" src="vendor/DataTables-1.10.13/extensions/Buttons/js/dataTables.buttons.min.js"></script>
+	<!-- JZIP -->
+	<script type="text/javascript" src="vendor/DataTables-1.10.13/jszip.min.js"></script>
+	<!-- PDF MAKE -->
+	<script type="text/javascript" src="vendor/DataTables-1.10.13/pdfmake.min.js"></script>
+	<!-- VFS FONT -->
+	<script type="text/javascript" src="vendor/DataTables-1.10.13/vfs_fonts.js"></script>
+	<!-- BUTTON HTML5 -->
+	<script type="text/javascript" src="/js/bootstrap-waitingfor.min.js"></script>
+	<!-- WAITING DIALOG -->
+	<script type="text/javascript" src="vendor/DataTables-1.10.13/extensions/Buttons/js/buttons.html5.js"></script>
+	
+<% } %>
+
+<% if(title === '首頁'){ %>
+	<!--  CHART JS -->
+    <script type="text/javascript"src="/myjs/index.js"></script>
+<% } else if(title === '圖表分析'){ %>
+	<!--  CHART JS -->
+    <script type="text/javascript"src="/myjs/chart.js"></script>
+<% } else if(title === '資料查詢'){ %>
+	<!--  FIND JS -->
+    <script type="text/javascript"src="/myjs/find.js"></script>
+<% } %>
 </body>
 
 </html>

@@ -123,9 +123,11 @@ function findUnitsAndShowNotify(req,res,isUpdate){
 }
 
 module.exports = function(app){
+  
   app.get('/', checkLogin);
+  
   app.get('/', function (req, res) {
-	var time    = req.query.time;
+	//var time    = req.query.time;
 	UnitDbTools.findAllUnits(function(err,units){
 		var successMessae,errorMessae;
 		var macTypeMap = {};
@@ -134,11 +136,7 @@ module.exports = function(app){
 		}
 		req.session.units = units;
 		var notify = getNotifyList();
-		if(time){
-			toUpdateLogByTime(time);
-		}
-		var logs = getLogList(time);
-		
+		var logs = getLogList();
 		var deviceList = getDeviceList(units);
 		
 		res.render('index', { title: '首頁',
@@ -150,6 +148,23 @@ module.exports = function(app){
 			logs:logs
 		});
 	});
+  });
+
+  //Jason add for delete log on 2017.05.15
+  app.get('/del/:time', function (req, res) {
+	var time    = req.params.time;
+	if(time){
+		toUpdateLogByTime(time);
+		var allLogs = JsonFileTools.getJsonFromFile(logPath);
+		if(time && allLogs[time]){
+			delete allLogs[time];
+			if( allLogs === null || allLogs === undefined){
+				allLogs = {};
+			}
+			JsonFileTools.saveJsonToFile(logPath,allLogs);
+		}
+		return res.redirect('/');
+	}
   });
 
   app.get('/login', checkNotLogin);
@@ -814,15 +829,15 @@ function changeNotify(max,min,maxInfo,minInfo,info){
 	return info;
 }
 
-function getLogList(time){
+function getLogList(){
 	var allLogs = JsonFileTools.getJsonFromFile(logPath);
-	if(time){
+	/*if(time){
 		delete allLogs[time];
 		if( allLogs === null || allLogs === undefined){
 			allLogs = {};
 		}
 		JsonFileTools.saveJsonToFile(logPath,allLogs);
-	}
+	}*/
 	var keys = Object.keys(allLogs);
 	var arr = [];
 	for(var i = 0;i<keys.length;i++){

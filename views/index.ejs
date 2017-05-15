@@ -223,7 +223,7 @@
                     <% if(logs) { %>
                         <% for(var i in logs){ %>
                             <div class="list-group">
-                                 <a href="/?time=<%= logs[i][2] %>" class="list-group-item">
+                                 <a href="/del/<%= logs[i][2] %>" class="list-group-item">
                                    <i class="fa fa-comment fa-fw"></i> <%= logs[i][0] %> : <%= logs[i][1] %>
                                 </a>
 

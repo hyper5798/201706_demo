@@ -122,12 +122,14 @@ exports.getNotifyDMArray = function (parseData) {
     var unit = JsonFileTools.getJsonFromFile(unitPath);
     var notifyInfo = notifyInfos[deviceType];
     var time =  parseData.date;
-    var msg = getNotifyMessage(dataInfo,notifyInfo);
-    
+    if(notifyInfo.notify){
+        var msg = getNotifyMessage(dataInfo,notifyInfo);
+    }else{
+        var msg = null;
+    }
     
     if(msg){
         var deviceName = unit[parseData.mac];
-        
         //save to DB & File
         saveLog(deviceName,msg,parseData.recv);
 

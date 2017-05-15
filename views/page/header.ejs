@@ -5,25 +5,30 @@
 <meta http-equiv="refresh" content="300; url=/">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><%= title%></title>
-<link href="css/bootstrap.css" rel="stylesheet">
-<link href="css/datepicker3.css" rel="stylesheet">
-<link href="css/styles.css" rel="stylesheet">
-<link rel="stylesheet" type="text/css" href="/js/jqplot/jquery.jqplot.css"/>
-<!-- Custom Fonts -->
-<link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-<script src="js/jquery.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/jqplot/jquery.jqplot.min.js"></script>
-<!--<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/themes/hot-sneaks/jquery-ui.css" rel="stylesheet">
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>-->
+<!-- JQUERY-UI STYLES-->
 <link href="css/jquery-ui.css" rel="stylesheet">
-<script src="/js/jquery-ui.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script type="text/javascript" src="jquery.validate.min.js"></script>
-<script type="text/javascript" src="additional-methods.min.js"></script>
-<script type="text/javascript" src="/localization/messages_zh_TW.js"></script>
+<!-- BOOTSTRAP STYLES-->
+<link href="css/bootstrap.css" rel="stylesheet">
+<!-- FONTAWESOME STYLES-->
+<link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<!-- CUSTOM STYLES-->
+<link href="css/styles.css" rel="stylesheet">
+<% if(title === '資料查詢' || title === '圖表分析' ){ %>	
+	<!-- JSCal2 STYLES-->
+	<link href="/vendor/JSCal2-1.7/css/jscal2.css" type="text/css" rel="stylesheet"  />
+<% } %>
 
+<% if( title === '圖表分析'){ %>	
+	<!-- JQPLOT STYLES-->
+	<link href="/js/jqplot/jquery.jqplot.css" rel="stylesheet" type="text/css" />
+<% } %>
 
+<% if(title === '資料查詢'){ %>	
+	<!-- jquery.dataTables-->
+	<link href="vendor/DataTables-1.10.13/media/css/jquery.dataTables.min.css" rel="stylesheet"/>
+	<!-- button.dataTables-->
+	<link href="vendor/DataTables-1.10.13/extensions/Buttons/css/buttons.dataTables.min.css" rel="stylesheet" />
+<% } %>
 </head>
 
 <body>
