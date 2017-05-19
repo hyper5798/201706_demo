@@ -5,7 +5,11 @@ var JsonFileTools =  require('./jsonFileTools.js');
 var board, led;
 var relay,pin;
 
-board = new webduino.WebArduino('kXz6');
+function init(){
+	board = new webduino.WebArduino('kXz6');
+}
+
+init();
 
 board.on('ready', function() {
   //led = new webduino.module.Led(board, board.getDigitalPin(10));
@@ -19,11 +23,11 @@ board.on('ready', function() {
 
 function autoCtrl(info){
     var  ctrlSet = JsonFileTools.getJsonFromFile(ctrlPath);
-    if(info.humidity > ctrlSet.max && relay){
+    if(ctrlSet.max && info.humidity > ctrlSet.max && relay){
         relay.off();
     }
 
-    if(info.humidity < ctrlSet.min && relay){
+    if(ctrlSet.min && info.humidity < ctrlSet.min && relay){
         relay.on();
     }
 }
@@ -66,6 +70,7 @@ function relayOff() {
     relay.off();
 }
 
+exports.init = init;
 exports.relayOn = relayOn;
 exports.relayOff = relayOff;
 exports.autoCtrl = autoCtrl;

@@ -375,13 +375,16 @@ module.exports = function(app){
   app.get('/update', checkLogin);
   app.get('/update', function (req, res) {
 	  //Jason add for filter weather device start
+	    var finalJson = JsonFileTools.getJsonFromFile(finalPath);
+		var units = JsonFileTools.getJsonFromFile(unitPath);
+		var keys = Object.keys(finalJson);
   		var newUnits = [];
-  		var units = req.session.units;
-  		for(var i = 0;i<units.length;i++){
+  		for(var i in keys){
   			//console.log('Debug update -> check '+ units[i].name +' type : '+ units[i].type);
   			console.log('Debug update -> check '+ JSON.stringify(units[i]));
-  			if(units[i].type == 'aa00'){
-  				newUnits.push(units[i]);
+  			if( finalJson[keys[i]].type == 'aa00'){
+				finalJson[keys[i]].name = units[finalJson[keys[i]].mac];
+  				newUnits.push(finalJson[keys[i]]);
   			}
   		}
 		//Jason add for filter weather device -- end

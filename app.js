@@ -129,15 +129,6 @@ app.use(function(err, req, res, next) {
   });
 });
 
-var max = 0,min =0;
-var json = JsonFileTools.getJsonFromFile('./public/data/temp.json');
-//console.log(typeof(json));
-if(json != null){
-	max = Number(json['max']);
-	min =  Number(json['min']);
-	switchBySetting(max,min);
-}
-
 var sock = require('socket.io').listen(server.listen(port));
 
 //Jason add for node-red on 2017.01.03
@@ -153,15 +144,12 @@ console.log('settings.cookieSecret : '+settings.cookieSecret);
 console.log('settings.db : '+settings.db);
 
 var date = moment();
-
-//macList is for unit type = 'aa00'
-var myUnits,macList = [];
-findUnitsMac();
+var myUnits;
 
 sock.on('connection',function(client){
 
 	//for new message ----------------------------------------------------------------------------
-	client.on('new_message_client',function(id, data){
+	/*client.on('new_message_client',function(id, data){
 
 		UnitDbTools.findAllUnits(function(err,allUnits){
 			if(err){
@@ -214,15 +202,15 @@ sock.on('connection',function(client){
 				}
 			}
 		});
-	});
+	});*/
 
 	client.on('disconnect',function(){
          console.log('Server has disconnected!');
 	});
 
-	client.on('new_message_test',function(data){
+	/*client.on('new_message_test',function(data){
 		client.emit('new_message_receive_mqtt','new_message_test');
-	});
+	});*/
 
 	//----------------------------------------------------------------------------
 	client.on('chart_client',function(data){
@@ -261,23 +249,6 @@ sock.on('connection',function(client){
     });
 });
 
-
-function switchBySetting(_max,_min){
-	DeviceDbTools.findLastDeviceByMacIndex('040004b8','aa01',function(err,device){
-		if(err){
-
-		}else{
-			if(device){
-				console.log('Debug new_message_client ->device  :'+device);
-				var temp = device.info.temperature;
-			}
-		}
-	});
-}
-
-
-
-
 function getShortenDevices(devices){
 	var interval = Math.floor(devices.length/145)+1;
 	var newDevices=[];
@@ -299,23 +270,3 @@ function getType(p) {
     else return 'other';
 }
 
-
-
-//for aa00 device (temprature/huminity) status
-function findUnitsMac(){
-	UnitDbTools.findAllUnits(function(err,units){
-		if(err){
-			errorMessae = err;
-		}else{
-			if(+units.length>0){
-				for(var i=0;i<units.length;i++){
-					//console.log( "unit :"+units[i] );
-					if(units[i].macAddr && units[i].type == 'aa00'){
-						console.log('mac ('+i+'):'+units[i].macAddr);
-						macList.push(units[i].macAddr);
-					}
-				}
-			}
-		}
-	});
-}
