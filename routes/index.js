@@ -15,6 +15,7 @@ var finalPath = './public/data/finalList.json';
 var logPath = './public/data/log.json';
 var unitPath = './public/data/unit.json';
 var userPath = './public/data/user.json';
+var ctrlPath = './public/data/ctrl.json';
 
 var hour = 60*60*1000;
 
@@ -135,7 +136,10 @@ module.exports = function(app){
 			req.session.units = [];
 		}
 		req.session.units = units;
+		//Jason add for show notify
+		//[number,arr] notify[0]:notify number notify[1]:notify list
 		var notify = getNotifyList();
+		//Jason add for show logs
 		var logs = getLogList();
 		var deviceList = getDeviceList(units);
 		//Jason add for user info in index on 2017.05.15
@@ -161,9 +165,7 @@ module.exports = function(app){
 		var allLogs = JsonFileTools.getJsonFromFile(logPath);
 		if(time && allLogs[time]){
 			delete allLogs[time];
-			if( allLogs === null || allLogs === undefined){
-				allLogs = {};
-			}
+			
 			JsonFileTools.saveJsonToFile(logPath,allLogs);
 		}
 		return res.redirect('/');
@@ -680,7 +682,6 @@ module.exports = function(app){
 				//Jason add for user info in index on 2017.05.15
 				var users = JsonFileTools.getJsonFromFile(userPath);
 				var index = users.indexOf(post_name);
-
 				if (index > -1) {
 					users.splice(index, 1);
 				}
@@ -744,12 +745,12 @@ module.exports = function(app){
   	app.get('/control', checkLogin);
     app.get('/control', function (req, res) {
     	var _max='',_min='';
-    	var json = JsonFileTools.getJsonFromFile('./public/data/temp.json');
+    	var json = JsonFileTools.getJsonFromFile(ctrlPath);
     	if(json){
     		_max = json['max'];
     		_min = json['min'];
     	}
-    	res.render('control', { title: '控制',
+    	res.render('control', { title: 'Webduino控制',
 			user:req.session.user,
 			error: null,
 			success: null,
@@ -764,7 +765,7 @@ module.exports = function(app){
 		var	post_max = req.body.max;
 		var post_min = req.body.min;
 		var json = {max:post_max,min:post_min};
-		JsonFileTools.saveJsonToFile('./public/data/temp.json',json);
+		JsonFileTools.saveJsonToFile(ctrlPath,json);
 		return res.redirect('/control');
 	});
 };
@@ -848,22 +849,22 @@ function changeNotify(max,min,maxInfo,minInfo,info){
 
 function getLogList(){
 	var allLogs = JsonFileTools.getJsonFromFile(logPath);
-	/*if(time){
-		delete allLogs[time];
-		if( allLogs === null || allLogs === undefined){
-			allLogs = {};
-		}
-		JsonFileTools.saveJsonToFile(logPath,allLogs);
-	}*/
-	var keys = Object.keys(allLogs);
 	var arr = [];
-	for(var i = 0;i<keys.length;i++){
-		if(allLogs[keys[i]]['subject']){
-			var mArr = [];
-			mArr.push(allLogs[keys[i]]['subject']);
-			mArr.push(allLogs[keys[i]]['content']);
-			mArr.push(allLogs[keys[i]]['createdTime']);
-			arr.push(mArr);
+
+	if(allLogs === null || allLogs === undefined){
+		allLogs = {};
+		JsonFileTools.saveJsonToFile(logPath,allLogs);
+	}else{
+		var keys = Object.keys(allLogs);
+		
+		for(var i = 0;i<keys.length;i++){
+			if(allLogs[keys[i]]['subject']){
+				var mArr = [];
+				mArr.push(allLogs[keys[i]]['subject']);
+				mArr.push(allLogs[keys[i]]['content']);
+				mArr.push(allLogs[keys[i]]['createdTime']);
+				arr.push(mArr);
+			}
 		}
 	}
 	return arr;

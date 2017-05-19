@@ -40,18 +40,25 @@
 	<script type="text/javascript" src="/js/bootstrap-waitingfor.min.js"></script>
 	<!-- WAITING DIALOG -->
 	<script type="text/javascript" src="vendor/DataTables-1.10.13/extensions/Buttons/js/buttons.html5.js"></script>
-	
+
 <% } %>
 
 <% if(title === '首頁'){ %>
 	<!--  CHART JS -->
-    <script type="text/javascript"src="/myjs/index.js"></script>
+    <script type="text/javascript"src="/myjs/myIndex.js"></script>
 <% } else if(title === '圖表分析'){ %>
 	<!--  CHART JS -->
     <script type="text/javascript"src="/myjs/chart.js"></script>
 <% } else if(title === '資料查詢'){ %>
 	<!--  FIND JS -->
     <script type="text/javascript"src="/myjs/find.js"></script>
+<% } else if(title === 'Webduino控制'){ %>
+	<!--  Webduino JS -->
+	<script type="text/javascript" src="/js/webduino/webduino-all.min.js"></script>
+	<script type="text/javascript" src="/js/webduino/webduino-blockly.js"></script>
+	<script type="text/javascript" src="/js/webduino/firebase.js"></script>
+	<script type="text/javascript" src="/js/webduino/runtime.min.js"></script>
+	<script type="text/javascript" src="/myjs/control.js"></script>
 <% } %>
 </body>
 

@@ -34,7 +34,7 @@ var async = require('async');
 var app = express();
 var port = process.env.PORT || 3000;
 app.set('port', port);
-app.set('httpsport', 8080);
+//app.set('httpsport', 8080);
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -62,14 +62,17 @@ app.use('/webhook', webhook);
 //
 routes(app);
 var server = http.createServer(app);
-var httpsServer = https.createServer(ssl.options, app).listen(app.get('httpsport'));
+//var httpsServer = https.createServer(ssl.options, app).listen(app.get('httpsport'));
 
 
 if(debug){
 	console.log('#########  Debug Mode #############');
 }
+/*Note:
+  All data from DB is initial in msgTools
+*/ 
 
-var settings = {
+var redSettings = {
     httpAdminRoot:"/red",
     httpNodeRoot: "/",
     userDir:"./.nodered/",
@@ -78,18 +81,19 @@ var settings = {
     	deviceDbTools:require("./models/deviceDbTools.js"),
 		msgTools:require("./models/msgTools.js"),
 		listeDbTools:require("./models/listDbTools.js"),
-    	debug:debug
+    	debug:debug,
+		webduinoCtrl : require('./models/webduinoCtrl.js')
     }    // enables global context
 };
 
 // Initialise the runtime with a server and settings
-RED.init(server,settings);
+RED.init(server,redSettings);
 
 // Serve the editor UI from /red
-app.use(settings.httpAdminRoot,RED.httpAdmin);
+app.use(redSettings.httpAdminRoot,RED.httpAdmin);
 
 // Serve the http nodes UI from /api
-app.use(settings.httpNodeRoot,RED.httpNode);
+app.use(redSettings.httpNodeRoot,RED.httpNode);
 //Jason modify on 2016.05.23
 //app.use('/', routes);
 //app.use('/users', users);
@@ -250,24 +254,6 @@ sock.on('connection',function(client){
 			}*/
 			client.emit('chart_client_db_result',devices);
 		});
-
-	});
-
-	client.on('control_client',function(data){
-		console.log('Debug control_client ------------------------------------------------------------start' );
-		console.log(moment().format('YYYY-MM_DD HH:mm:ss')+' Debug giot_client :' + data );
-	});
-	client.on('control_client_setSwitch',function(data){
-		//console.log('Debug giot_client ------------------------------------------------------------start' );
-		console.log(moment().format('YYYY-MM_DD HH:mm:ss')+' Debug control_client_setSwitch :' + data );
-	});
-
-	client.on('control_client_setTempLimit',function(data){
-		//console.log('Debug giot_client ------------------------------------------------------------start' );
-		console.log(moment().format('YYYY-MM_DD HH:mm:ss')+' Debug control_client_setTempLimit :' + JSON.stringify(data) );
-		max = Number(data['max']);
-		min = Number(data['min']);
-		switchBySetting(max,min);
 	});
 
 	client.on('disconnect', function () {

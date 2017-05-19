@@ -2,37 +2,37 @@
 		<div class="row">
 			<div class="col-md-12 column">
 				<div class="panel panel-primary">
-					<div class="panel-heading"><span class="glyphicon glyphicon-edit"></span> 溫度開關設定</div>
+					<div class="panel-heading"><span class="glyphicon glyphicon-edit"></span> 水閥開關設定</div>
 					<div class="panel-body">
 						<form id="editDevice" class="form-horizontal" action="" method="post">
 							<fieldset>
 								<!-- Name input-->
 								<div class="col-md-6 column">
 									<div class="form-group">
-										<label class="col-md-3 control-label" for="name">溫度超過</label>
+										<label class="col-md-3 control-label" for="name">濕度超過</label>
 										<div class="col-md-9">
-											<input id="max" name="max" type="text" placeholder="請輸入最高溫度" value="<%= max %>" class="form-control" required/>
+											<input id="max" name="max" type="text" placeholder="請輸入最高濕度" value="<%= max %>" class="form-control" required/>
 										</div>
 									</div>
 
 									<!-- Email input-->
 									<div class="form-group">
-										<label class="col-md-3 control-label" for="email">溫度低於</label>
+										<label class="col-md-3 control-label" for="email">濕度低於</label>
 										<div class="col-md-9">
-											<input id="min" name="min" type="text" placeholder="請輸入最低溫度" value="<%= min %>" class="form-control" required/>
+											<input id="min" name="min" type="text" placeholder="請輸入最低濕度" value="<%= min %>" class="form-control" required/>
 										</div>
 									</div>
 								</div>
 								<div class="col-md-6 column">
 									<!-- Type select-->
 									<div class="form-group">
-										<label class="control-label" for="type">開燈</label>
+										<label class="control-label" for="type">關水閥</label>
 										</div>
 									</div>
 
 									<!-- Email input-->
 									<div class="form-group">
-										<label class="control-label" for="name">關燈</label>
+										<label class="control-label" for="name">開水閥</label>
 									</div>
 									<button type="button" id="edit" name="edit" class="btn btn-primary btn-sm" onClick="editCheck(this)">
 										<span class="glyphicon glyphicon-edit"></span> 設定
@@ -53,12 +53,12 @@
 					<div class="panel-body">
 						<div class="col-md-2 column">
 							<button type="button" id="edit" name="edit" class="btn btn-success btn-sm" onClick="openLigt(this)">
-								<span class="glyphicon glyphicon-volume-up"></span> 開燈
+								<span class="glyphicon glyphicon-volume-up"></span> 開水閥
 							</button>
 						</div>
 						<div class="col-md-2 column">
 							<button type="button" id="del" name="del" class="btn btn-danger btn-sm " onClick="closeLight(this)">
-								<span class="glyphicon glyphicon-volume-off"></span> 關燈
+								<span class="glyphicon glyphicon-volume-off"></span> 關水閥
 							</button>
 						</div>
 					</div>
@@ -67,61 +67,4 @@
 		</div><!--/.col-->
 
 
-
-
-<script class="code" type="text/javascript">
-	$(document).ready(function () {
-		setTimeout(function(){
-		    //do what you need here
-		    document.getElementById('error_message').innerText = '';
-		}, 3000);
-	});
-
-
-
-    var socket = io.connect();
-	socket.on('connect',function(){
-        socket.emit('control_client','hello,control_client socket cient is ready');
-    });
-
-	/*$("form").submit(function () {
-	  	if(document.getElementById("mac").value.length != 8){
-			alert('MAC字數須為8');
-			return false;
-		}else{
-			$("#type_option").children().each(function(){
-            	//alert('$(this).val() = '+  $(this).val() + ' -> '+$("#type_option").val());
-			    if ($(this).val()==$("#type_option").val()){
-			        //jQuery給法
-			        $(this).attr("selected", "true"); //或是給"selected"也可
-			        //alert(' $(this).text() : '+ $(this).text());
-			        var typeString = document.getElementById("typeString");
-            		typeString.value = $(this).text();
-			        //javascript給法
-			        this.selected = true;
-	    		}
-			});
-		}
-	});*/
-
-	function openLigt(){
-		//alert('openLigt');
-		socket.emit('control_client_setSwitch','on');
-	}
-
-	function editCheck(button){
-		//alert('test');
-
-		var max_val = $('#max').val();
-		var min_val = $('#min').val();
-		//alert('max : '+max_val);
-		socket.emit('control_client_setTempLimit',{max:max_val,min:min_val});
-		document.getElementById("editDevice").submit();
-	}
-
-	function closeLight(button){
-		//alert('closeLight');
-		socket.emit('control_client_setSwitch','off');
-	}
-</script>
 <%- include page/footer %>

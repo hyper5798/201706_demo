@@ -1,6 +1,6 @@
 {
   "name": "demo",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "private": true,
   "scripts": {
     "start": "node app.js"
@@ -27,6 +27,7 @@
     "serve-favicon": "~2.3.0",
     "socket.io": "*",
     "socket.io-client": "^1.4.8",
+    "webduino-js": "^0.4.15",
     "yql-node": "^0.2.1"
   }
 }
