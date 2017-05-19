@@ -7,8 +7,6 @@ var log =  require('./log.js');
 var settings =  require('../settings.js');
 var debug = settings.debug;
 var deviceDbTools =  require('./deviceDbTools.js');
-var unitDbTools = require('./unitDbTools.js');
-var UserDbTools =  require('./userDbTools.js');
 var mData,mMac,mRecv,mDate,mTimestamp,mType,mExtra ;
 var obj;
 var overtime = 24;
@@ -20,7 +18,6 @@ var notifyPath = './public/data/notifyList.json';
 var infoPath = './public/data/deviceInfos.json';
 var unitPath = './public/data/unit.json';
 var logPath = './public/data/log.json';
-var userPath = './public/data/user.json';
 
 //Save data
 var finalList = {};
@@ -34,37 +31,6 @@ function init(){
         console.log('lists[0] :\n'+JSON.stringify(lists[0]));
         finalList = lists[0].list;
         saveFinalListToFile();
-    });
-
-    unitDbTools.findAllUnits(function(err,units){
-        var allunits = {};
-        for(var i in units){
-            var unit = units[i];
-            allunits[unit.macAddr] = unit.name;
-        }
-        JsonFileTools.saveJsonToFile(unitPath,allunits);
-    });
-
-    log.findLogs({review:false},function(err,logs){
-        if(err)
-            return;
-        var allLogs = {};
-        for(var i in logs){
-            
-            allLogs[ logs[i]['createdTime'] ]= logs[i];
-        }
-        JsonFileTools.saveJsonToFile(logPath,allLogs);
-    });
-
-    UserDbTools.findAllUsers(function (err,users){
-        if(err)
-            return;
-        var userList = [];
-        for(var i in users){
-            
-           userList.push(users[i]['name'])
-        }
-        JsonFileTools.saveJsonToFile(userPath,userList);
     });
 }
 
@@ -124,7 +90,7 @@ exports.parseMsg = function (msg) {
 }
 
 function saveToDB(obj,list){
-
+    
     listDbTools.updateList('finalList',list,function(err,info){
         if(err){
             console.log("supdateList Error :"+saveDeviceMsg);
@@ -149,7 +115,7 @@ exports.getFinalList = function () {
 }
 
 exports.getNotifyDMArray = function (parseData) {
-
+    
     var deviceType = parseData.type;
     var dataInfo = parseData.information;
     var notifyInfos = JsonFileTools.getJsonFromFile(infoPath);
@@ -161,7 +127,7 @@ exports.getNotifyDMArray = function (parseData) {
     }else{
         var msg = null;
     }
-
+    
     if(msg){
         var deviceName = unit[parseData.mac];
         //save to DB & File
@@ -192,13 +158,13 @@ function getNotifyMessage(dataInfo,notifyInfo){
     console.log('dataInfo:' + JSON.stringify(dataInfo));
     console.log('notifyInfo:' + JSON.stringify(notifyInfo));
     var msg = '';
-
+   
     var notify = notifyInfo.notify;
     var keys = Object.keys(notify);
     for(var i in keys){
         if(notify[keys[i]].max || notify[keys[i]].min){
             var check = dataInfo[keys[i]];
-
+            
             if(notify[keys[i]].max && check > notify[keys[i]].max){
                 var str = '('+notify[keys[i]].max+')';
                 msg = msg.concat(notify[keys[i]].maxInfo);
@@ -227,7 +193,7 @@ function getDM(user,message){
     var str2 = ' ';
 
     str1=str1.concat(user);
-    str2=str2.concat(message);
+    str2=str2.concat(message); 
     str1=str1.concat(str2);
     msg= {"payload":str1};
     return msg
@@ -239,9 +205,9 @@ function saveLog(deviceName,msg,recv){
     log.saveLog(json,function(err,result){
         if(!err){
             delete json.type;
-            var mLog = JsonFileTools.getJsonFromFile(logPath);
-            mLog[json.createdTime] = json;
-            JsonFileTools.saveJsonToFile(logPath,mLog);
+            var log = JsonFileTools.getJsonFromFile(logPath);
+            log[json.createdTime] = json;
+            JsonFileTools.saveJsonToFile(logPath,log);
         }
     });
 }

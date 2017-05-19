@@ -68,9 +68,6 @@ var httpsServer = https.createServer(ssl.options, app).listen(app.get('httpsport
 if(debug){
 	console.log('#########  Debug Mode #############');
 }
-/*Note:
-  All data from DB is initial in msgTools
-*/ 
 
 var settings = {
     httpAdminRoot:"/red",
@@ -81,8 +78,7 @@ var settings = {
     	deviceDbTools:require("./models/deviceDbTools.js"),
 		msgTools:require("./models/msgTools.js"),
 		listeDbTools:require("./models/listDbTools.js"),
-    	debug:debug,
-		webduinoCtrl : require('./models/webduinoCtrl.js')
+    	debug:debug
     }    // enables global context
 };
 
@@ -255,6 +251,23 @@ sock.on('connection',function(client){
 			client.emit('chart_client_db_result',devices);
 		});
 
+	});
+
+	client.on('control_client',function(data){
+		console.log('Debug control_client ------------------------------------------------------------start' );
+		console.log(moment().format('YYYY-MM_DD HH:mm:ss')+' Debug giot_client :' + data );
+	});
+	client.on('control_client_setSwitch',function(data){
+		//console.log('Debug giot_client ------------------------------------------------------------start' );
+		console.log(moment().format('YYYY-MM_DD HH:mm:ss')+' Debug control_client_setSwitch :' + data );
+	});
+
+	client.on('control_client_setTempLimit',function(data){
+		//console.log('Debug giot_client ------------------------------------------------------------start' );
+		console.log(moment().format('YYYY-MM_DD HH:mm:ss')+' Debug control_client_setTempLimit :' + JSON.stringify(data) );
+		max = Number(data['max']);
+		min = Number(data['min']);
+		switchBySetting(max,min);
 	});
 
 	client.on('disconnect', function () {
